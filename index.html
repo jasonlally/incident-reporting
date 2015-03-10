@@ -207,7 +207,7 @@
         var end = new Date();
         console.log(end - start);
         $(".loading").hide();
-        map.fitBounds(geoJsonLayer.getBounds());
+        map.fitBounds(radius.getBounds());
       });
       event.preventDefault();
     });

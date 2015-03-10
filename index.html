@@ -179,9 +179,10 @@
     $('#formaddress').submit(function() {
       var datageojson;
       var datasetAPI = "https://data.sfgov.org/resource/tmnf-yvry.json";
+      var appToken = "W4RBmRyo2ORX3liaMhmwRjMHT"
       var feet = $('#range-slider-input').val();
       var meters = feet * .3048;
-      var datasetUrl = datasetAPI + "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC";
+      var datasetUrl = datasetAPI + "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC&$$app_token=" + appToken;
 
       $.getJSON(datasetUrl, function(data) {
         geojsondata = toGeojson(data, 'location');

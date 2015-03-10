@@ -54,7 +54,9 @@
       </form>
     </div>
     <div id="map" style="width:100%; height:500px; margin-top: 20px;">
-
+      <div class="loading" style="display:none;">
+        <div class="circle"></div>
+      </div>
     </div>
 
   </div>
@@ -177,6 +179,8 @@
     });
 
     $('#formaddress').submit(function() {
+      $(".loading").show();
+      var start = new Date();
       var datageojson;
       var datasetAPI = "https://data.sfgov.org/resource/tmnf-yvry.json";
       var appToken = "W4RBmRyo2ORX3liaMhmwRjMHT"
@@ -185,8 +189,9 @@
       var datasetUrl = datasetAPI + "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC&$$app_token=" + appToken;
 
       $.getJSON(datasetUrl, function(data) {
+        var dataTime = new Date();
+        console.log(dataTime - start)
         geojsondata = toGeojson(data, 'location');
-        console.log(datasetUrl);
         radius.setLatLng([centerLat, centerLon])
         radius.setRadius(meters);
 
@@ -198,8 +203,11 @@
 
           marker.bindPopup(popupContent);
         });
-        console.log(geojsondata);
         geoJsonLayer.setGeoJSON(geojsondata);
+        var end = new Date();
+        console.log(end - start);
+        $(".loading").hide();
+        map.fitBounds(geoJsonLayer.getBounds());
       });
       event.preventDefault();
     });

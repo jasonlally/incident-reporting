@@ -131,6 +131,8 @@
     var centerLat, centerLon;
     var radius = L.circle([50.5, 30.5], 200).addTo(map);
     var geoJsonLayer = L.mapbox.featureLayer().addTo(map);
+    var feet = $('#range-slider-input').val();
+    var meters = feet * .3048;
 
     /*
     var addresses = new Bloodhound({
@@ -172,6 +174,9 @@
             centerLon = d.features[$(e.target).attr('data-index')].geometry.coordinates[0];
             $('#inputAddress').val($(e.target).html());
             $('#suggestresults').hide();
+            map.panTo([centerLat,centerLon]);
+            radius.setLatLng([centerLat, centerLon])
+            radius.setRadius(meters);
           })
         });
       }
@@ -181,11 +186,11 @@
     $('#formaddress').submit(function() {
       $(".loading").show();
       var start = new Date();
+      feet = $('#range-slider-input').val();
+      meters = feet * .3048;
       var datageojson;
       var datasetAPI = "https://data.sfgov.org/resource/tmnf-yvry.json";
       var appToken = "W4RBmRyo2ORX3liaMhmwRjMHT"
-      var feet = $('#range-slider-input').val();
-      var meters = feet * .3048;
       var datasetUrl = datasetAPI + "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC&$$app_token=" + appToken;
 
       $.getJSON(datasetUrl, function(data) {

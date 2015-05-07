@@ -189,14 +189,15 @@
       feet = $('#range-slider-input').val();
       meters = feet * .3048;
       var datageojson;
-      var datasetAPI = "https://data.sfgov.org/resource/tmnf-yvry.json";
+      var datasetAPI = "https://data.sfgov.org/resource/cuks-n6tp.geojson";
       var appToken = "W4RBmRyo2ORX3liaMhmwRjMHT"
       var datasetUrl = datasetAPI + "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC&$$app_token=" + appToken;
 
       $.getJSON(datasetUrl, function(data) {
         var dataTime = new Date();
         console.log(dataTime - start)
-        geojsondata = toGeojson(data, 'location');
+        geojsondata = data;
+        //geojsondata = toGeojson(data, 'location');
         radius.setLatLng([centerLat, centerLon])
         radius.setRadius(meters);
 

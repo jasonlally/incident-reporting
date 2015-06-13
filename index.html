@@ -13,6 +13,7 @@
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css">
   <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.css' rel='stylesheet'>
   <link rel="stylesheet" href="daterangepicker.css">
   <link rel="stylesheet" href="jquery.nouislider.css">
@@ -58,7 +59,28 @@
         <div class="circle"></div>
       </div>
     </div>
-
+    <a href="" id="download-csv"><button class="btn btn-sm btn-primary download-csv"><span class="glyphicon glyphicon-arrow-down"></span> Download CSV</button></a>
+    <a href="" id="open-geojsonio"><button class="btn btn-sm btn-primary open-geojsonio"><span class="glyphicon glyphicon-arrow-down"></span> Open with Geojson.io</button></a>
+    <a hrer="" id="open-cartodb"><button class="btn btn-sm btn-primary open-cartodb"><span class="glyphicon glyphicon-arrow-down"></span> Open with CartoDB</button></a>
+    <table id="example" class="display table" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>IncidntNum</th>
+                <th>Category</th>
+                <th>Descript</th>
+                <th>Resolution</th>
+            </tr>
+        </thead>
+ 
+        <tfoot>
+            <tr>
+                <th>IncidntNum</th>
+                <th>Category</th>
+                <th>Descript</th>
+                <th>Resolution</th>
+            </tr>
+        </tfoot>
+    </table>
   </div>
   <!-- /.container -->
 
@@ -70,19 +92,20 @@
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.js'></script>
+  <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+  <script src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
   <script src='moment.js'></script>
   <script src='daterangepicker.js'></script>
-  <script src="jquery.dstk.js"></script>
   <script src="jquery.nouislider.all.min.js"></script>
   <script src="typeahead.bundle.js"></script>
   <script>
+  var table;
   $(function() {
-    var dstk = $.DSTK();
     var startD = moment().subtract(29, 'days').format('YYYY-MM-DD'),
       endD = moment().format('YYYY-MM-DD');
-
+  
     $('#daterange').val(moment().subtract(29, 'days').format('MM/DD/YYYY') + ' - ' + moment().format('MM/DD/YYYY'))
-
+  
     $('#daterange').daterangepicker({
         ranges: {
           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
@@ -103,7 +126,7 @@
         $('#daterange').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
       }
     );
-
+  
     $('#range-slider').noUiSlider({
       start: [1320],
       step: 1,
@@ -113,17 +136,17 @@
         'max': [5280]
       }
     });
-
+  
     $('#range-slider').on({
       slide: function() {
         radius.setRadius($(this).val() * .3048);
       }
     })
-
+  
     $("#range-slider").Link('lower').to($('#range-slider-input'), null, wNumb({
       decimals: 0
     }));
-
+  
     L.mapbox.accessToken = 'pk.eyJ1IjoiZGF0YXNmIiwiYSI6Ilo3bVlHRDQifQ.7gkiPnZtioL8CnCvJ5z9Bg';
     var map = L.mapbox.map('map', 'datasf.j9b9ihf0').setView([37.767806, -122.438153], 12);
     var geoJsonLayer = L.geoJson();
@@ -133,22 +156,22 @@
     var geoJsonLayer = L.mapbox.featureLayer().addTo(map);
     var feet = $('#range-slider-input').val();
     var meters = feet * .3048;
-
+  
     /*
     var addresses = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       remote: 'http://api.tiles.mapbox.com/v4/geocode/mapbox.places/%QUERY.json?access_token=pk.eyJ1IjoiZGF0YXNmIiwiYSI6Ilo3bVlHRDQifQ.7gkiPnZtioL8CnCvJ5z9Bg'
     });
-
+  
     addresses.initialize();
-
+  
     $('.typeahead').typeahead(null, {
       name: 'addresses',
       displayKey: 'value', // if not set, will default to 'value',
       source: addresses.ttAdapter()
     });*/
-
+  
     $('.typeahead').on('keypress', function(e) {
       console.log(encodeURIComponent($(e.target).val()));
       if ($(e.target).val().length > 3) {
@@ -174,94 +197,70 @@
             centerLon = d.features[$(e.target).attr('data-index')].geometry.coordinates[0];
             $('#inputAddress').val($(e.target).html());
             $('#suggestresults').hide();
-            map.panTo([centerLat,centerLon]);
+            map.panTo([centerLat, centerLon]);
             radius.setLatLng([centerLat, centerLon])
             radius.setRadius(meters);
           })
         });
       }
-
+      
     });
-
-    $('#formaddress').submit(function() {
+    
+    table = $('#example').DataTable( {
+        "ajax": {
+          "url": "empty.json",
+          "dataSrc": ""
+        },
+        "columns": [
+            { "data": "incidntnum" },
+            { "data": "category" },
+            { "data": "descript" },
+            { "data": "resolution" }
+        ],
+        "pageLength": 50
+    });
+    
+    console.log(table);
+  
+    $('#formaddress').submit(function(e) {
       $(".loading").show();
       var start = new Date();
       feet = $('#range-slider-input').val();
       meters = feet * .3048;
       var datageojson;
-      var datasetAPI = "https://data.sfgov.org/resource/cuks-n6tp.geojson";
+      var datasetAPI = "https://data.sfgov.org/resource/cuks-n6tp";
       var appToken = "W4RBmRyo2ORX3liaMhmwRjMHT"
-      var datasetUrl = datasetAPI + "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC&$$app_token=" + appToken;
-
-      $.getJSON(datasetUrl, function(data) {
+      var query = "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC";
+      var datasetUrlGeo = datasetAPI + ".geojson" + query;
+      $.getJSON(datasetUrlGeo, function(data) {
         var dataTime = new Date();
-        console.log(dataTime - start)
-        geojsondata = data;
+        var geojsondata = data;
         //geojsondata = toGeojson(data, 'location');
         radius.setLatLng([centerLat, centerLon])
         radius.setRadius(meters);
-
+  
         geoJsonLayer.on('layeradd', function(e) {
           var marker = e.layer,
             feature = marker.feature;
-
+  
           var popupContent = feature.properties.category;
-
+  
           marker.bindPopup(popupContent);
         });
         geoJsonLayer.setGeoJSON(geojsondata);
-        var end = new Date();
-        console.log(end - start);
         $(".loading").hide();
         map.fitBounds(radius.getBounds());
       });
-      event.preventDefault();
+      var datasetUrlJson = datasetAPI + ".json" + query;
+      var datasetUrlCsv = datasetAPI + ".csv" + query;
+      table.ajax.url(datasetUrlJson).load();
+      
+      //var file = "https://data.sfgov.org/api/views/cuks-n6tp/rows.csv?accessType=DOWNLOAD";
+      $('#open-cartodb').attr("href","//oneclick.cartodb.com/?file=" + encodeURIComponent(encodeURI(datasetUrlGeo)) + "&provider=DataSF"); //and logo=
+      $('#download-csv').attr("href",datasetUrlCsv);
+      $("#open-geojsonio").attr("href","http://geojson.io/#data=data:text/x-url,"+encodeURIComponent(datasetUrlGeo));
+      e.preventDefault();
     });
-
-    // This toGeojson function was made from
-    // lovingly borrowed code from the inimitable
-    // chelm (https://github.com/chelm and the socrata-koop
-    // project: https://github.com/chelm/koop-socrata
-
-    function toGeojson(json, locationField) {
-      if (!json || !json.length) {
-        console.log('Failed to get data');
-      } else {
-        var geojson = {
-          type: 'FeatureCollection',
-          features: []
-        };
-        var geojsonFeature;
-        json.forEach(function(feature, i) {
-          geojsonFeature = {
-            type: 'Feature',
-            geometry: {},
-            id: i + 1
-          };
-          if (feature && locationField) {
-            if (feature[locationField] && feature[locationField].latitude && feature[locationField].longitude) {
-              geojsonFeature.geometry.coordinates = [parseFloat(feature[locationField].longitude), parseFloat(feature[locationField].latitude)];
-              geojsonFeature.geometry.type = 'Point';
-              delete feature.location;
-              geojsonFeature.properties = feature;
-              geojson.features.push(geojsonFeature);
-            }
-          } else if (feature && feature.latitude && feature.longitude) {
-            geojsonFeature.geometry.coordinates = [parseFloat(feature.longitude), parseFloat(feature.latitude)];
-            geojsonFeature.geometry.type = 'Point';
-            geojsonFeature.properties = feature;
-            geojson.features.push(geojsonFeature);
-          } else {
-            geojsonFeature.geometry = null;
-            geojsonFeature.properties = feature;
-            geojson.features.push(geojsonFeature);
-          }
-          geojsonFeature.properties['marker-size'] = "small";
-          geojsonFeature.properties['marker-color'] = "#00007f";
-        });
-        return geojson;
-      }
-    };
   });
   </script>
 </body>

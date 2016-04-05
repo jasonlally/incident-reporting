@@ -175,19 +175,19 @@
     $('.typeahead').on('keypress', function(e) {
       console.log(encodeURIComponent($(e.target).val()));
       if ($(e.target).val().length > 3) {
-        var url = "//pelias.mapzen.com/suggest"
+        var url = "//search.mapzen.com/v1/autocomplete"
         var params = {
-          input: $(e.target).val(),
-          lat: 37.76,
-          lon: -122.43,
-          zoom: 12
+          api_key: 'search-kz-89WY',
+          text: $(e.target).val(),
+          'focus.point.lat': 37.76,
+          'focus.point.lon': -122.43
         }
         $.getJSON(url, params, function(d) {
           $("#suggestresults").empty();
           $("#suggestresults").show();
           console.log(d);
           $.each(d.features, function(key, val) {
-            var result = $('<li>').html(val.properties.text);
+            var result = $('<li>').html(val.properties.label);
             result.attr('data-index', key);
             $("#suggestresults").append(result);
           });

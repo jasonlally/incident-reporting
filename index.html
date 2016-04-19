@@ -9,15 +9,16 @@
   <meta name="author" content="">
   <link rel="icon" href="../../favicon.ico">
 
-  <title>Starter Template for Bootstrap</title>
+  <title>SFPD Incident Reports Map</title>
 
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css">
-  <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.css' rel='stylesheet'>
-  <link rel="stylesheet" href="daterangepicker.css">
-  <link rel="stylesheet" href="jquery.nouislider.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href='//api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.css'>
+  <link rel="stylesheet" href='//api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' />
+  <link rel="stylesheet" href='//api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' />  
+  <link rel="stylesheet" href="css/daterangepicker.css">
+  <link rel="stylesheet" href="css/jquery.nouislider.css">
+  <link rel="stylesheet" href="css/style.css">
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -30,181 +31,123 @@
   <div class="container">
 
     <div class="starter-template">
-      <h1>Map SFPD Incident Reports</h1>
-      <form id="formaddress" class="form-inline">
-        <div class="form-group" id="searchgroup">
-          <label for="exampleInputEmail1">Address</label>
-          <input type="text" class="form-control typeahead" id="inputAddress" placeholder="Enter address" autocomplete="off">
-          <ul id="suggestresults" style="display:none;">
-          </ul>
-        </div>
-        <div class="form-group">
-          <label for="range-slider-input">Radius</label>
-          <input id="range-slider-input" class="form-control" type="text" style="width:60px; text-align: right;"> ft
-        </div>
-        <div class="form-group">
-          <div style="width:150px; float:right;">
-            <div id="range-slider"></div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="select-time">Time period</label>
-          <input id="daterange" type="text" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-primary">Map Incidents</button>
-      </form>
+        <h1>Map SFPD Incident Reports</h1>
+      
+	    <div id="sfim-controls" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div id="address-control" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+				<div class="form-group" id="searchgroup">
+					<label for="exampleInputEmail1">Address</label>
+					<input type="text" class="form-control typeahead" id="inputAddress" placeholder="Enter address" autocomplete="off">
+					<ul id="suggestresults" style="display:none;"></ul>
+				</div>			
+			</div>
+            <div id="slider-number-control" class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+			    <div class="form-group">
+                    <label for="range-slider-input">Radius (ft)</label>
+                    <input id="range-slider-input" class="form-control" type="text">
+                </div>			
+			</div>
+            <div id="slider-control" class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                <div class="form-group">
+                    <div class="slider-body">
+                        <div id="range-slider"></div>
+                    </div>
+                </div>			
+			</div>			
+			<div id="date-control" class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                <div class="form-group">
+                    <label for="select-time">Time period</label>
+                    <input id="daterange" type="text" class="form-control">
+                </div>			
+			</div>
+		</div>	  
     </div>
-    <div id="map" style="width:100%; height:500px; margin-top: 20px;">
-      <div class="loading" style="display:none;">
-        <div class="circle"></div>
-      </div>
+    <div id="map" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="loading" style="display:none;">
+            <div class="circle"></div>
+        </div>
     </div>
-    <a href="" id="download-csv"><button class="btn btn-sm btn-primary download-csv"><span class="glyphicon glyphicon-arrow-down"></span> Download CSV</button></a>
-    <a href="" id="open-geojsonio"><button class="btn btn-sm btn-primary open-geojsonio"><span class="glyphicon glyphicon-arrow-down"></span> Open with Geojson.io</button></a>
-    <a hrer="" id="open-cartodb"><button class="btn btn-sm btn-primary open-cartodb"><span class="glyphicon glyphicon-arrow-down"></span> Open with CartoDB</button></a>
-    <table id="example" class="display table" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>IncidntNum</th>
-                <th>Category</th>
-                <th>Descript</th>
-                <th>Resolution</th>
-            </tr>
-        </thead>
- 
-        <tfoot>
-            <tr>
-                <th>IncidntNum</th>
-                <th>Category</th>
-                <th>Descript</th>
-                <th>Resolution</th>
-            </tr>
-        </tfoot>
-    </table>
+	<div id="btns-export" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">
+	    <div class="export-btn col-xs-12 col-sm-12 col-md-4 col-lg-4">
+		    <a href="" id="download-csv"><button class="btn btn-sm btn-primary download-csv btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Download CSV</button></a>
+		</div>
+		<div class="export-btn col-xs-12 col-sm-12 col-md-4 col-lg-4">
+		    <a href="" id="open-geojsonio"><button class="btn btn-sm btn-primary open-geojsonio btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Open with Geojson.io</button></a>
+		</div>
+		<div class="export-btn right col-xs-12 col-sm-12 col-md-4 col-lg-4">
+		    <a hrer="" id="open-cartodb"><button class="btn btn-sm btn-primary open-cartodb btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Open with CartoDB</button></a>
+		</div>
+	</div> 
+    <div id="sfim-table" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">	
+		<table id="example" class="display table" cellspacing="0" width="100%">
+			<thead>
+				<tr>
+					<th>IncidntNum</th>
+					<th>Category</th>
+					<th>Descript</th>
+					<th>Resolution</th>
+				</tr>
+			</thead>
+	 
+			<tfoot>
+				<tr>
+					<th>IncidntNum</th>
+					<th>Category</th>
+					<th>Descript</th>
+					<th>Resolution</th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
   </div>
   <!-- /.container -->
 
-
-  <!-- Bootstrap core JavaScript
-    ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.js'></script>
-  <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-  <script src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
-  <script src='moment.js'></script>
-  <script src='daterangepicker.js'></script>
-  <script src="jquery.nouislider.all.min.js"></script>
-  <script src="typeahead.bundle.js"></script>
-  <script>
+    <!-- Load jQuery from Google's CDN, so that it is likely to be already in the client's cache -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  
+    <!-- Load pre-made scripts from vendors -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src='//api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.js'></script>
+    <script src='//api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>	
+    <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <script src='js/vendor/moment.js'></script>
+    <script src='js/vendor/daterangepicker.js'></script>
+    <script src="js/vendor/jquery.nouislider.all.min.js"></script>
+    <script src="js/vendor/typeahead.bundle.js"></script>
+    <!-- Pre-made scripts loaded -->
+  
+    <!-- Loading modules -->
+    <script src="js/modules/resources.js"></script>
+    <script src="js/modules/map.js"></script>
+    <script src="js/modules/controls.js"></script>
+    <script src="js/modules/table.js"></script>
+    <!-- Loading modules finished.... -->
+  
+    <script>
+    
+	    /**
+		    Lets start the whole application from a jQuery document.ready event			
+		*/
+	    $(document).ready(function(){
+		    
+			//Start the resources module first so that all resources we might ever need would be loaded
+			resourcesModule.init(initializeUI);
+			
+			function initializeUI(){
+			    //Start the UI relevant modules here in a callback function
+				mapModule.init($("#map"));
+				controlsModule.init($("#sfim-controls"));				
+			}
+			
+		});
+  
   var table;
+  
   $(function() {
-    var startD = moment().subtract(29, 'days').format('YYYY-MM-DD'),
-      endD = moment().format('YYYY-MM-DD');
+
   
-    $('#daterange').val(moment().subtract(29, 'days').format('MM/DD/YYYY') + ' - ' + moment().format('MM/DD/YYYY'))
-  
-    $('#daterange').daterangepicker({
-        ranges: {
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-          'This Month': [moment().startOf('month'), moment().endOf('month')],
-          'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-          'This Quarter': [moment().startOf('quarter'), moment().endOf('quarter')],
-          'Last Quarter': [moment().subtract(3, 'months').startOf('quarter'), moment().subtract(3, 'months').endOf('quarter')],
-          'This Year': [moment().startOf('year'), moment()],
-          'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-        },
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment(),
-        format: 'MM/DD/YYYY'
-      },
-      function(start, end) {
-        startD = start.format('YYYY-MM-DD');
-        endD = end.format('YYYY-MM-DD');
-        $('#daterange').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
-      }
-    );
-  
-    $('#range-slider').noUiSlider({
-      start: [1320],
-      step: 1,
-      connect: 'lower',
-      range: {
-        'min': [0],
-        'max': [5280]
-      }
-    });
-  
-    $('#range-slider').on({
-      slide: function() {
-        radius.setRadius($(this).val() * .3048);
-      }
-    })
-  
-    $("#range-slider").Link('lower').to($('#range-slider-input'), null, wNumb({
-      decimals: 0
-    }));
-  
-    L.mapbox.accessToken = 'pk.eyJ1IjoiZGF0YXNmIiwiYSI6Ilo3bVlHRDQifQ.7gkiPnZtioL8CnCvJ5z9Bg';
-    var map = L.mapbox.map('map', 'datasf.j9b9ihf0').setView([37.767806, -122.438153], 12);
-    var geoJsonLayer = L.geoJson();
-    var center = L.mapbox.featureLayer().addTo(map);
-    var centerLat, centerLon;
-    var radius = L.circle([50.5, 30.5], 200).addTo(map);
-    var geoJsonLayer = L.mapbox.featureLayer().addTo(map);
-    var feet = $('#range-slider-input').val();
-    var meters = feet * .3048;
-  
-    /*
-    var addresses = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      remote: 'http://api.tiles.mapbox.com/v4/geocode/mapbox.places/%QUERY.json?access_token=pk.eyJ1IjoiZGF0YXNmIiwiYSI6Ilo3bVlHRDQifQ.7gkiPnZtioL8CnCvJ5z9Bg'
-    });
-  
-    addresses.initialize();
-  
-    $('.typeahead').typeahead(null, {
-      name: 'addresses',
-      displayKey: 'value', // if not set, will default to 'value',
-      source: addresses.ttAdapter()
-    });*/
-  
-    $('.typeahead').on('keypress', function(e) {
-      console.log(encodeURIComponent($(e.target).val()));
-      if ($(e.target).val().length > 3) {
-        var url = "//search.mapzen.com/v1/autocomplete"
-        var params = {
-          api_key: 'search-kz-89WY',
-          text: $(e.target).val(),
-          'focus.point.lat': 37.76,
-          'focus.point.lon': -122.43
-        }
-        $.getJSON(url, params, function(d) {
-          $("#suggestresults").empty();
-          $("#suggestresults").show();
-          console.log(d);
-          $.each(d.features, function(key, val) {
-            var result = $('<li>').html(val.properties.label);
-            result.attr('data-index', key);
-            $("#suggestresults").append(result);
-          });
-          $("#suggestresults li").on('click', function(e) {
-            center.setGeoJSON(d.features[$(e.target).attr('data-index')]);
-            centerLat = d.features[$(e.target).attr('data-index')].geometry.coordinates[1];
-            centerLon = d.features[$(e.target).attr('data-index')].geometry.coordinates[0];
-            $('#inputAddress').val($(e.target).html());
-            $('#suggestresults').hide();
-            map.panTo([centerLat, centerLon]);
-            radius.setLatLng([centerLat, centerLon])
-            radius.setRadius(meters);
-          })
-        });
-      }
-      
-    });
+
     
     table = $('#example').DataTable( {
         "ajax": {
@@ -220,47 +163,9 @@
         "pageLength": 50
     });
     
-    console.log(table);
+    //console.log(table);
   
-    $('#formaddress').submit(function(e) {
-      $(".loading").show();
-      var start = new Date();
-      feet = $('#range-slider-input').val();
-      meters = feet * .3048;
-      var datageojson;
-      var datasetAPI = "https://data.sfgov.org/resource/cuks-n6tp";
-      var appToken = "W4RBmRyo2ORX3liaMhmwRjMHT"
-      var query = "?$where=date >= '" + startD + "' AND date <= '" + endD + "' AND within_circle(location," + centerLat + "," + centerLon + "," + meters + ")&$order=date DESC";
-      var datasetUrlGeo = datasetAPI + ".geojson" + query;
-      $.getJSON(datasetUrlGeo, function(data) {
-        var dataTime = new Date();
-        var geojsondata = data;
-        //geojsondata = toGeojson(data, 'location');
-        radius.setLatLng([centerLat, centerLon])
-        radius.setRadius(meters);
-  
-        geoJsonLayer.on('layeradd', function(e) {
-          var marker = e.layer,
-            feature = marker.feature;
-  
-          var popupContent = feature.properties.category;
-  
-          marker.bindPopup(popupContent);
-        });
-        geoJsonLayer.setGeoJSON(geojsondata);
-        $(".loading").hide();
-        map.fitBounds(radius.getBounds());
-      });
-      var datasetUrlJson = datasetAPI + ".json" + query;
-      var datasetUrlCsv = datasetAPI + ".csv" + query;
-      table.ajax.url(datasetUrlJson).load();
-      
-      //var file = "https://data.sfgov.org/api/views/cuks-n6tp/rows.csv?accessType=DOWNLOAD";
-      $('#open-cartodb').attr("href","//oneclick.cartodb.com/?file=" + encodeURIComponent(encodeURI(datasetUrlGeo)) + "&provider=DataSF"); //and logo=
-      $('#download-csv').attr("href",datasetUrlCsv);
-      $("#open-geojsonio").attr("href","http://geojson.io/#data=data:text/x-url,"+encodeURIComponent(datasetUrlGeo));
-      e.preventDefault();
-    });
+
   });
   </script>
 </body>

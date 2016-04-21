@@ -96,3 +96,12 @@ body {
 	    padding:5px 0px !important;
 	}
 }
+@media (max-width: 991px){
+    #slider-number-control{
+	    padding-left:0px !important;
+		padding-right:0px !important;
+	}
+	#btns-export div{
+	    padding:5px 0px !important;
+	}
+}

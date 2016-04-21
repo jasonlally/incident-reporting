@@ -1,7 +1,9 @@
 var controlsModule = (function(window,$){
     
-	//Global variables within the module scope
+	/*Global variables within the module scope*/
     var _controlBarContainer;
+	var _controlBarLowerContainer;
+	var _table;
     var _options = {
 	    "startDate": null,
 		"endDate": null
@@ -10,7 +12,7 @@ var controlsModule = (function(window,$){
     /**
       * @param {object} domContainer
     */		
-	function _init(domContainer){
+	function _init(domContainer, domContainer2){
 	
 	    //Initialize the module here
 		if(!!domContainer){
@@ -50,6 +52,8 @@ var controlsModule = (function(window,$){
 					resourcesModule.getIncidentsFromAPI(query, function(data){
 			            //data - is a FeatureCollection with an array "features"
 				        mapModule.drawApiResponse(data);
+						_refreshDownloadButtonURLs(query);
+						_loadDataToTable(query);
 			        });
 				},
 			    "set": function(){
@@ -62,20 +66,9 @@ var controlsModule = (function(window,$){
 					resourcesModule.getIncidentsFromAPI(query, function(data){
 			            //data - is a FeatureCollection with an array "features"
 				        mapModule.drawApiResponse(data);
-			        });
-					
-/*
-      var datasetUrlJson = datasetAPI + ".json" + query;
-      var datasetUrlCsv = datasetAPI + ".csv" + query;
-      table.ajax.url(datasetUrlJson).load();
-      
-      //var file = "https://data.sfgov.org/api/views/cuks-n6tp/rows.csv?accessType=DOWNLOAD";
-      $('#open-cartodb').attr("href","//oneclick.cartodb.com/?file=" + encodeURIComponent(encodeURI(datasetUrlGeo)) + "&provider=DataSF"); //and logo=
-      $('#download-csv').attr("href",datasetUrlCsv);
-      $("#open-geojsonio").attr("href","http://geojson.io/#data=data:text/x-url,"+encodeURIComponent(datasetUrlGeo));
-*/
-
-					
+						_refreshDownloadButtonURLs(query);
+						_loadDataToTable(query);
+			        });					
 				}					
             });
 			
@@ -116,19 +109,57 @@ var controlsModule = (function(window,$){
 				resourcesModule.getIncidentsFromAPI(query, function(data){
 					//data - is a FeatureCollection with an array "features"
 					mapModule.drawApiResponse(data);
-				});
-				
+					_refreshDownloadButtonURLs(query);
+					_loadDataToTable(query);
+				});			
 			});			
 			
 		}
 		else
 		{
 		    //Error
-		    alert("Sidebar container doesn't exist");
-		}		
+		    alert("Upper controls container doesn't exist");
+		}
+
+        if(!!domContainer2){
+		    _controlBarLowerContainer = domContainer2;
+			
+			_table = _controlBarLowerContainer.find('#example').DataTable({
+                "ajax": {
+                    "url": "empty.json",
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "incidntnum" },
+                    { "data": "category" },
+                    { "data": "descript" },
+                    { "data": "resolution" }
+                ],
+                "pageLength": 50
+            });			
+		}
+		else
+		{
+		    alert("Lower controls container doesn't exist");
+		}
 	}
-	
-	
+
+    /**
+      * @param {string} query
+    */		
+    function _refreshDownloadButtonURLs(query){
+		_controlBarLowerContainer.find("#download-csv").attr("href", resourcesModule.getCsvLink(query));
+		_controlBarLowerContainer.find("#open-geojsonio").attr("href", resourcesModule.getGeojsonio(query));
+		_controlBarLowerContainer.find("#open-cartodb").attr("href", resourcesModule.getCartoDbUrl(query));
+	}
+
+    /**
+      * @param {string} query
+    */		
+	function _loadDataToTable(query){
+	    var datasetURL = resourcesModule.getDatasetJsonURL(query);
+		_table.ajax.url(datasetURL).load();
+	}
 	
     /**
       * @param {array} sgstnData

@@ -28,7 +28,7 @@
 
 <body>
   
-  <div class="container">
+<div class="container">
 
     <div class="starter-template">
         <h1>Map SFPD Incident Reports</h1>
@@ -67,40 +67,44 @@
             <div class="circle"></div>
         </div>
     </div>
-	<div id="btns-export" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">
-	    <div class="export-btn col-xs-12 col-sm-12 col-md-4 col-lg-4">
-		    <a href="" id="download-csv"><button class="btn btn-sm btn-primary download-csv btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Download CSV</button></a>
+	
+	<div id="controls-lower" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">
+		<div id="btns-export" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">
+			<div class="export-btn col-xs-12 col-sm-12 col-md-4 col-lg-4">
+				<a href="javascript:void(0)" id="download-csv"><button class="btn btn-sm btn-primary download-csv btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Download CSV</button></a>
+			</div>
+			<div class="export-btn col-xs-12 col-sm-12 col-md-4 col-lg-4">
+				<a href="javascript:void(0)" id="open-geojsonio"><button class="btn btn-sm btn-primary open-geojsonio btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Open with Geojson.io</button></a>
+			</div>
+			<div class="export-btn right col-xs-12 col-sm-12 col-md-4 col-lg-4">
+				<a hrer="javascript:void(0)" id="open-cartodb"><button class="btn btn-sm btn-primary open-cartodb btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Open with CartoDB</button></a>
+			</div>
 		</div>
-		<div class="export-btn col-xs-12 col-sm-12 col-md-4 col-lg-4">
-		    <a href="" id="open-geojsonio"><button class="btn btn-sm btn-primary open-geojsonio btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Open with Geojson.io</button></a>
+	
+		<div id="sfim-table" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">	
+			<table id="example" class="display table" cellspacing="0" width="100%">
+				<thead>
+					<tr>
+						<th>IncidntNum</th>
+						<th>Category</th>
+						<th>Descript</th>
+						<th>Resolution</th>
+					</tr>
+				</thead>
+		 
+				<tfoot>
+					<tr>
+						<th>IncidntNum</th>
+						<th>Category</th>
+						<th>Descript</th>
+						<th>Resolution</th>
+					</tr>
+				</tfoot>
+			</table>
 		</div>
-		<div class="export-btn right col-xs-12 col-sm-12 col-md-4 col-lg-4">
-		    <a hrer="" id="open-cartodb"><button class="btn btn-sm btn-primary open-cartodb btn-block"><span class="glyphicon glyphicon-arrow-down"></span> Open with CartoDB</button></a>
-		</div>
-	</div> 
-    <div id="sfim-table" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">	
-		<table id="example" class="display table" cellspacing="0" width="100%">
-			<thead>
-				<tr>
-					<th>IncidntNum</th>
-					<th>Category</th>
-					<th>Descript</th>
-					<th>Resolution</th>
-				</tr>
-			</thead>
-	 
-			<tfoot>
-				<tr>
-					<th>IncidntNum</th>
-					<th>Category</th>
-					<th>Descript</th>
-					<th>Resolution</th>
-				</tr>
-			</tfoot>
-		</table>
 	</div>
-  </div>
-  <!-- /.container -->
+	
+</div>
 
     <!-- Load jQuery from Google's CDN, so that it is likely to be already in the client's cache -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -137,36 +141,10 @@
 			function initializeUI(){
 			    //Start the UI relevant modules here in a callback function
 				mapModule.init($("#map"));
-				controlsModule.init($("#sfim-controls"));				
+				controlsModule.init($("#sfim-controls"), $("#controls-lower"));				
 			}
 			
 		});
-  
-  var table;
-  
-  $(function() {
-
-  
-
-    
-    table = $('#example').DataTable( {
-        "ajax": {
-          "url": "empty.json",
-          "dataSrc": ""
-        },
-        "columns": [
-            { "data": "incidntnum" },
-            { "data": "category" },
-            { "data": "descript" },
-            { "data": "resolution" }
-        ],
-        "pageLength": 50
-    });
-    
-    //console.log(table);
-  
-
-  });
   </script>
 </body>
 

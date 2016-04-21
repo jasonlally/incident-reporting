@@ -1,6 +1,6 @@
 var mapModule = (function(window,$){
     
-	//Global variables within the module scope
+	/*Global variables within the module scope*/
     var _mapContainer;
 	var _mapboxBaseMapCode = 'datasf.j9b9ihf0';
 	var _components = {

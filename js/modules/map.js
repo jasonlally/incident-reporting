@@ -60,7 +60,7 @@ var mapModule = (function(window,$){
 	    if(response["features"].length>0){
 		    //Color all incident records to RED
 			for(i=0;i<response["features"].length;i++){
-			    response["features"][i]["properties"] = $.extend({}, response["features"][i]["properties"], {"marker-color": "#FF0000", "marker-symbol": "danger", "marker-size": "small"});
+			    response["features"][i]["properties"] = $.extend({}, response["features"][i]["properties"], {"marker-color": "#000080", "marker-symbol": "police", "marker-size": "small"});
 			}
 			
 			//Clear the cluster contents

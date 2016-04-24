@@ -1,0 +1,107 @@
+body {
+  margin-top: 25px;
+}
+
+#sfim-controls, #address-control, #slider-control, #date-control{
+    padding:0px !important;
+}
+#slider-control{
+    padding-top:32px !important;
+}
+#slider-control .slider-body{
+    width:250px; 
+	margin: 0 auto;
+}
+
+#map{
+   height:500px;
+   margin-top:20px;
+   padding:0px !important;
+}
+
+#suggestresults {
+    position: absolute;
+	list-style-type:none;
+    width: 300px;
+    z-index: 1001;
+    background: white;
+    top: 59px;
+    border-radius: 4px;
+    padding:5px;
+    max-width:100%;
+    border: thin solid #d3d3d3;
+}
+#suggestresults li{
+    margin-bottom:3px; 
+	padding:5px;
+}
+#suggestresults li:hover{
+    background-color: #d3d3d3;
+	color: #FFFFFF;
+	cursor:pointer;
+	border-radius: 4px;
+}
+
+#searchgroup {
+  position: relative;
+}
+
+.circle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  -webkit-box-sizing: border-box;
+  border: solid 10px rgba(255, 255, 255, 0.2);
+  border-top-color: #FFF;
+  -webkit-animation: spin 1s infinite linear;
+  margin: auto auto;
+  top: 200px;
+}
+
+@-webkit-keyframes spin { 
+  100% { 
+    -webkit-transform: rotate(360deg); 
+  } 
+} 
+
+.loading {
+  z-index: 1001;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background: rgba(0,0,0,.6);
+}
+
+#btns-export div{
+    padding: 10px 10px 10px 0px;
+}
+#btns-export .right{
+   padding:10px 0px;
+}
+@media (max-width: 768px){
+    #slider-number-control{
+	    padding-left:0px !important;
+		padding-right:0px !important;
+	}
+    #slider-control{
+	    padding-left:0px !important;
+		padding-right:0px !important;
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;		
+	}
+	#btns-export div{
+	    padding:5px 0px !important;
+	}
+}
+@media (max-width: 991px){
+    #slider-number-control{
+	    padding-left:0px !important;
+		padding-right:0px !important;
+	}
+	#btns-export div{
+	    padding:5px 0px !important;
+	}
+}

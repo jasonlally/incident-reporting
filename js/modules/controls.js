@@ -202,6 +202,7 @@ var controlsModule = (function(window,$){
 			resourcesModule.getIncidentsFromAPI(query, function(data){
 			    //data - is a FeatureCollection with an array "features"
 				mapModule.drawApiResponse(data);
+				_loadDataToTable(query);
 			});
         });		
 	}

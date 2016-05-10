@@ -1,4 +1,4 @@
-# incident-reporting
+# SF Crime Data
 A quick prototype to test pulling incident reports from SF Open Data
 
 ## Initial Use Case:

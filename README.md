@@ -1,6 +1,8 @@
 # SF Crime Data
 A quick prototype to test pulling incident reports from SF Open Data
 
+Note: this repository takes advantage of [ZenHub](https://www.zenhub.io/). If you haven't added it to your Github yet, it's recommended to better understand how issues are prioritized.
+
 ## Initial Use Case:
 Universities and colleges are required by a federal law, [the Jeanne Clery Act](http://clerycenter.org/summary-jeanne-clery-act), to report crime statistics on specific crimes that happened within ~500 feet of anywhere their student population went. The SFPD fields about 2,500 requests per year from universities and colleges for information about those crimes, which take between 20-40 minutes to fulfill... per request, which is about ~156.25 8-hour days. They need to do a radial search around a specific address (or list of addresses), as provided by the universities or colleges.
 

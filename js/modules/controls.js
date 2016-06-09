@@ -18,6 +18,8 @@ var controlsModule = (function(window,$){
 		if(!!domContainer){
 		    //Yeah - it does exist
            _controlBarContainer = domContainer;
+           
+           _setDataUpdated();
 
             //Wire events
             _controlBarContainer.find('.typeahead').on('keypress', function(e) {
@@ -118,7 +120,7 @@ var controlsModule = (function(window,$){
 		else
 		{
 		    //Error
-		    alert("Upper controls container doesn't exist");
+		    console.log("Upper controls container doesn't exist");
 		}
 
         if(!!domContainer2){
@@ -140,7 +142,7 @@ var controlsModule = (function(window,$){
 		}
 		else
 		{
-		    alert("Lower controls container doesn't exist");
+		    console.log("Lower controls container doesn't exist");
 		}
 	}
 
@@ -206,6 +208,15 @@ var controlsModule = (function(window,$){
 				_loadDataToTable(query);
 			});
         });		
+	}
+	
+	function _setDataUpdated(){
+		var query = "?$select=date,time&$limit=1&$order=date DESC,time DESC";
+		var datasetRequest = resourcesModule.getDatasetJsonURL(query);
+		$.getJSON(datasetRequest, function(data){
+			console.log(data)
+			$('#data-updated').html('<b>Data available through ' + moment(data[0].date).format('MMMM DD, YYYY') + ' at ' + moment(data[0].time,'HH:mm').format('hh:mm a')+'</b>')
+		});
 	}
 	
 	function _getStartDate(){

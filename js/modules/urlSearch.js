@@ -1,4 +1,5 @@
 // test search = http://127.0.0.1:8080/?address=900%20Van%20Ness%20Avenue&city=San%20Francisco&state=CA&zip=94109
+// test searchLive = https://sf-crime-data-61764.firebaseapp.com/?address=900%20Van%20Ness%20Avenue&city=San%20Francisco&state=CA&zip=94109
 
 var urlSearch = (function(){
 
@@ -34,7 +35,24 @@ var urlSearch = (function(){
       });
     })
   }
+
+  function _urlPushSearch(locationResult) {
+    var newSearch = null;
+    var uri = new URI();
+    var searchInput = {
+      address: locationResult.properties.name,
+      city: locationResult.properties.locality,
+      state: locationResult.properties.region_a,
+      zip: locationResult.properties.postalcode
+    }
+    uri.setSearch(searchInput)
+    newSearch = uri.build();
+
+    history.pushState(null, '', newSearch)
+  }
+
   return {
-    runURLsearch: _runURLsearch
+    runURLsearch: _runURLsearch,
+    urlPushSearch: _urlPushSearch
   }
 })()

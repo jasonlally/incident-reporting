@@ -180,7 +180,6 @@ var controlsModule = (function(window, $) {
     function _setSuggestionsListContent(sgstnList) {
         _controlBarContainer.find("#suggestresults").empty().show().html(sgstnList.html());
         _controlBarContainer.find("#suggestresults li").on('click', function(e) {
-          console.log("e.target", e.target);
 
             //Assign the returned autocomplete values to a variable
             var acFeatures = resourcesModule.getLatestAutocompleteFeatures();
@@ -197,6 +196,9 @@ var controlsModule = (function(window, $) {
 
             //Start the API call
             var userLocation = mapModule.getUserLocation();
+
+            urlSearch.urlPushSearch(userLocation) // push search results into url
+
             var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 
             mapModule.showLoader();

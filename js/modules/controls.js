@@ -32,7 +32,7 @@ var controlsModule = (function(window, $) {
             });
 
             _controlBarContainer.find('#range-slider').noUiSlider({
-                start: [1320],
+                start: [urlSearch.getRadius("ft")],
                 step: 1,
                 connect: 'lower',
                 range: {
@@ -47,6 +47,7 @@ var controlsModule = (function(window, $) {
                 },
                 "change": function() {
                     var userLocation = mapModule.getUserLocation();
+                    urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()) // push search results into url
                     var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 
                     mapModule.showLoader();
@@ -61,6 +62,7 @@ var controlsModule = (function(window, $) {
                 "set": function() {
                     mapModule.setUserSearchRadius($(this).val() * .3048);
                     var userLocation = mapModule.getUserLocation();
+                    urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()) // push search results into url
                     var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 
                     mapModule.showLoader();
@@ -81,7 +83,7 @@ var controlsModule = (function(window, $) {
             _options["startDate"] = moment().subtract(29, 'days').format('YYYY-MM-DD');
             _options["endDate"] = moment().format('YYYY-MM-DD');
 
-            _controlBarContainer.find('#daterange').val(moment().subtract(29, 'days').format('MM/DD/YYYY') + ' - ' + moment().format('MM/DD/YYYY'));
+            _controlBarContainer.find('#daterange').val(urlSearch.getStartDate().format('MM/DD/YYYY') + ' - ' + urlSearch.getEndDate().format('MM/DD/YYYY'));
 
             _controlBarContainer.find('#daterange').daterangepicker({
                     ranges: {
@@ -93,8 +95,8 @@ var controlsModule = (function(window, $) {
                         'This Year': [moment().startOf('year'), moment()],
                         'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
                     },
-                    startDate: moment().subtract(29, 'days'),
-                    endDate: moment(),
+                    startDate: urlSearch.getStartDate() || moment().subtract(29, 'days'), // OR isn't needed here, but would then totally depend on urlSearch module
+                    endDate: urlSearch.getEndDate() || moment(), // OR isn't needed here, but would then totally depend on urlSearch module
                     format: 'MM/DD/YYYY'
                 },
                 function(start, end) {
@@ -104,6 +106,9 @@ var controlsModule = (function(window, $) {
 
                     //Start the API call
                     var userLocation = mapModule.getUserLocation();
+
+                    urlSearch.urlPushSearch(userLocation, _options, null) // push search results into url
+
                     var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 
                     mapModule.showLoader();
@@ -197,7 +202,7 @@ var controlsModule = (function(window, $) {
             //Start the API call
             var userLocation = mapModule.getUserLocation();
 
-            urlSearch.urlPushSearch(userLocation) // push search results into url
+            urlSearch.urlPushSearch(userLocation, _options, mapModule.getUserSearchRadius()) // push search results into url
 
             var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 

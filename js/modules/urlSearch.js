@@ -1,12 +1,9 @@
-// test search = http://127.0.0.1:8080/?address=500+Church+Street&city=San+Francisco&state=CA&zip=94114&startDate=2016-06-01&endDate=2016-06-30
-// test searchLive = https://sf-crime-data-61764.firebaseapp.com/?address=900%20Van%20Ness%20Avenue&city=San%20Francisco&state=CA&zip=94109
 
 var urlSearch = (function(){
 
   function _runURLsearch(){
     var uri = new URI();
     uri = uri.query(true);
-    console.log("urlSearch uri", uri);
 
     var search = uri.address + ", " + uri.city + ", " + uri.state + ", " + uri.zip
 

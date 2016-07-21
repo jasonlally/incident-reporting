@@ -157,6 +157,7 @@ var controlsModule = (function(window, $) {
         _controlBarLowerContainer.find("#download-csv").attr("href", resourcesModule.getCsvLink(query));
         _controlBarLowerContainer.find("#open-geojsonio").attr("href", resourcesModule.getGeojsonio(query));
         _controlBarLowerContainer.find("#open-cartodb").attr("href", resourcesModule.getCartoDbUrl(query));
+        _controlBarLowerContainer.find("#email-share").attr("href", resourcesModule.setEmailLink());
     }
 
     /**

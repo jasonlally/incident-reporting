@@ -178,7 +178,7 @@ var controlsModule = (function(window, $) {
     }
 
     /**
-     * @param {object} sgstnList
+     * @param {number} clickedIndex
      */
     function _setSuggestionsListContent(clickedIndex) {
 

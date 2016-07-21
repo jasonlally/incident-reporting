@@ -19,7 +19,6 @@ var urlSearch = (function(){
 
       //assign the selected values to the address and radius fields
       $('#inputAddress').val(search);
-      // $('#').value(uri.radius);
 
       //Start the API call
       var userLocation = mapModule.getUserLocation();

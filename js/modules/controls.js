@@ -22,14 +22,23 @@ var controlsModule = (function(window, $) {
             _setDataUpdated();
 
             //Wire events
-            _controlBarContainer.find('.typeahead').on('keypress', function(e) {
-                if ($(e.target).val().length > 3) {
-                    resourcesModule.getAutoSuggestionsFromService($(e.target).val(), function(data) {
-                        var suggestions = controlsModule.populateSuggestionsList(data);
-                        controlsModule.setSuggestionsListContent(suggestions);
-                    });
-                }
-            });
+            $('.typeahead').typeahead({
+      				source: function (query, process) {
+      					addresses = [];
+      					resourcesModule.getAutoSuggestionsFromService(query, function(data){
+      						$.each(data, function (i, address) {
+      							addresses.push(address.text);
+      						});
+      						process(addresses);
+      					});
+      				},
+      				updater: function(item) {
+      					clickedIndex = $('.typeahead').find('.active').index();
+      					controlsModule.setSuggestionsListContent(clickedIndex);
+      					return item;
+      				},
+      				minLength: 4, items: 10
+      			})
 
             _controlBarContainer.find('#range-slider').noUiSlider({
                 start: [urlSearch.getRadius("ft")],
@@ -169,52 +178,34 @@ var controlsModule = (function(window, $) {
     }
 
     /**
-     * @param {array} sgstnData
-     */
-    function _populateSuggestionsList(sgstnData) {
-        var $sgstnList = $("<ul>");
-        $.each(sgstnData, function(key, val) {
-            var $result = $('<li>').attr('data-index', val.idx).html(val.text);
-            $sgstnList.append($result);
-        });
-        return $sgstnList;
-    }
-
-    /**
      * @param {object} sgstnList
      */
-    function _setSuggestionsListContent(sgstnList) {
-        _controlBarContainer.find("#suggestresults").empty().show().html(sgstnList.html());
-        _controlBarContainer.find("#suggestresults li").on('click', function(e) {
+    function _setSuggestionsListContent(clickedIndex) {
 
-            //Assign the returned autocomplete values to a variable
-            var acFeatures = resourcesModule.getLatestAutocompleteFeatures();
+        //Assign the returned autocomplete values to a variable
+        var acFeatures = resourcesModule.getLatestAutocompleteFeatures();
 
-            //Use the map module to change the user pin's location
-            mapModule.plotUserLocation(acFeatures[$(e.target).attr('data-index')]);
-            mapModule.centerMapOnLocation(acFeatures[$(e.target).attr('data-index')]);
+        //Use the map module to change the user pin's location
+        mapModule.plotUserLocation(acFeatures[clickedIndex]);
+        mapModule.centerMapOnLocation(acFeatures[clickedIndex]);
 
-            //assign the selected value to the address field
-            $('#inputAddress').val($(e.target).html());
+        //Hide the suggestions list
+        $(this).parent().hide();
 
-            //Hide the suggestions list
-            $(this).parent().hide();
+        //Start the API call
+        var userLocation = mapModule.getUserLocation();
 
-            //Start the API call
-            var userLocation = mapModule.getUserLocation();
+        urlSearch.urlPushSearch(userLocation, _options, mapModule.getUserSearchRadius()) // push search results into url
 
-            urlSearch.urlPushSearch(userLocation, _options, mapModule.getUserSearchRadius()) // push search results into url
+        var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 
-            var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
+        mapModule.showLoader();
 
-            mapModule.showLoader();
-
-            resourcesModule.getIncidentsFromAPI(query, function(data) {
-                //data - is a FeatureCollection with an array "features"
-                mapModule.drawApiResponse(data);
-                _refreshDownloadButtonURLs(query);
-                _loadDataToTable(query);
-            });
+        resourcesModule.getIncidentsFromAPI(query, function(data) {
+            //data - is a FeatureCollection with an array "features"
+            mapModule.drawApiResponse(data);
+            _refreshDownloadButtonURLs(query);
+            _loadDataToTable(query);
         });
     }
 
@@ -237,7 +228,6 @@ var controlsModule = (function(window, $) {
 
     return {
         init: _init,
-        populateSuggestionsList: _populateSuggestionsList,
         setSuggestionsListContent: _setSuggestionsListContent,
         getEndDate: _getEndDate,
         getStartDate: _getStartDate,

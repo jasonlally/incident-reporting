@@ -143,16 +143,57 @@ var controlsModule = (function(window, $) {
                     "url": "empty.json",
                     "dataSrc": ""
                 },
+                "dom": '<"table-buttons"<"table-buttons"Bl>f>t<"table-buttons"ip>',
+                "buttons":['colvis'],
+                "fixedHeader": {
+                    header: true,
+                    footer: true
+                },
                 "columns": [{
-                    "data": "incidntnum"
+                  "data": "incidntnum",
+                  "title": "Incident #",
+                  "name": "incidntnum",
                 }, {
-                    "data": "category"
+                  "data": "date",
+                  "title": "Date",
+                  "name": "date",
+                  "render": function(data, type, row, meta) {
+                    return moment(data).format('l')
+                  },
+                  "visible": false
                 }, {
-                    "data": "descript"
+                  "data": "time",
+                  "title": "Time",
+                  "name": "time",
+                  "visible": false
                 }, {
-                    "data": "resolution"
+                  "data": "address",
+                  "title": "Address",
+                  "name": "address",
+                  "visible": false
+                }, {
+                  "data": "pddistrict",
+                  "title": "District",
+                  "name": "pddistrict",
+                  "visible": false
+                }, {
+                  "data": "category",
+                  "title": "Category",
+                  "name": "category",
+                }, {
+                  "data": "descript",
+                  "title": "Description",
+                  "name": "descript",
+                }, {
+                  "data": "resolution",
+                  "title": "Resolution",
+                  "name": "resolution",
                 }],
-                "pageLength": 50
+                "pageLength": 50,
+                "footerCallback": function(tfoot, data, start, end, display) {
+                  var dupHeaderRow = $(this.api().table().header()).children('tr:first').clone()
+                  // $(tfoot).html(dupHeaderRow.html());
+                }
             });
         } else {
             console.log("Lower controls container doesn't exist");
@@ -174,7 +215,9 @@ var controlsModule = (function(window, $) {
      */
     function _loadDataToTable(query) {
         var datasetURL = resourcesModule.getDatasetJsonURL(query);
-        _table.ajax.url(datasetURL).load();
+        _table.ajax.url(datasetURL).load(function(data){
+          // console.log("data", data);
+        });
     }
 
     /**

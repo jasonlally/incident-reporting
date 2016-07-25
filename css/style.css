@@ -13,6 +13,12 @@ body {
 	margin: 0 auto;
 }
 
+.table-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 #map{
    height:500px;
    margin-top:20px;

@@ -20,6 +20,7 @@ body {
 }
 
 .dropdown-menu {
+	z-index: 1001;
     background: white;
     border-radius: 4px;
     padding:5px;

@@ -78,6 +78,12 @@ body {
 #btns-export .right{
    padding:10px 0px;
 }
+
+footer {
+  margin-top: 2em;
+  text-align: center;
+}
+
 @media (max-width: 768px){
     #slider-number-control{
 	    padding-left:0px !important;

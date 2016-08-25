@@ -25,6 +25,11 @@ Create a single place for all universities and colleges in the United States to 
  - **Front-end developer!** Yup. Self-explanatory if you read the above paragraph. Bonus points if you love APIs and are up for the challenge of keeping the whole project browser-based... even the coming versions.
  - **Future project lead!** If you're interested managing in this project, come check it out asap and get up to speed... then build it out so any police department in the country can use it. **Time savings in the multiple thousands of workdays across the entire U.S.**
 
+##Running Codebase Locally
+If you want to download the github repository and run the code locally on your Apple machine,
+- open terminal
+- go to the folder directory 
+- run 'python -m SimpleHTTPServer'
 
 ## What's Next?
 After speaking with the Crime Data Analysis Unit at the SFPD on 5/6/16 for initial user **research**, the current prototype satisfies their minimum needs. They plan to direct future inquiring universities and colleges directly to [http://sfcrimedata.org]. Great!

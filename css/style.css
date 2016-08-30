@@ -9,7 +9,7 @@ body {
     padding-top:32px !important;
 }
 #slider-control .slider-body{
-    width:250px; 
+    width:250px;
 	margin: 0 auto;
 }
 
@@ -20,15 +20,15 @@ body {
 }
 
 .dropdown-menu {
-	z-index: 1001;
     background: white;
     border-radius: 4px;
     padding:5px;
     max-width:100%;
     border: thin solid #d3d3d3;
+    z-index: 1001;
 }
 .dropdown-menu li a {
-    margin-bottom:3px; 
+    margin-bottom:3px;
 	padding:5px;
 }
 .dropdown-menu li.active a,
@@ -56,11 +56,11 @@ body {
   top: 200px;
 }
 
-@-webkit-keyframes spin { 
-  100% { 
-    -webkit-transform: rotate(360deg); 
-  } 
-} 
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
 
 .loading {
   z-index: 1001;
@@ -78,12 +78,6 @@ body {
 #btns-export .right{
    padding:10px 0px;
 }
-
-footer {
-  margin-top: 2em;
-  text-align: center;
-}
-
 @media (max-width: 768px){
     #slider-number-control{
 	    padding-left:0px !important;
@@ -93,7 +87,7 @@ footer {
 	    padding-left:0px !important;
 		padding-right:0px !important;
         padding-top: 20px !important;
-        padding-bottom: 20px !important;		
+        padding-bottom: 20px !important;
 	}
 	#btns-export div{
 	    padding:5px 0px !important;

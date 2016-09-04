@@ -46,7 +46,7 @@ var mapModule = (function(window,$){
 		_components["layers"]["searchradius"] = L.circle([37.767806, -122.438153], 402.3).addTo(_components["map"]);
 
 		//Plot the initial user location
-		//_components["layers"]["user"].setGeoJSON({ "type": "Feature","properties": {"marker-size": "large"}, "geometry": {"type": "Point", "coordinates": [-122.438153,37.767806]}});
+		_components["layers"]["user"].setGeoJSON({ "type": "Feature","properties": {"marker-size": "large"}, "geometry": {"type": "Point", "coordinates": [-122.438153,37.767806]}});
 
 		//Add all layers to the map instance
 		_enableAllLayers();

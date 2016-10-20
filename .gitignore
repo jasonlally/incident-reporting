@@ -4,3 +4,4 @@ _site/
 database.rules.json
 firebase.json
 .firebaserc
+*.swp

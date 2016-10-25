@@ -2,7 +2,7 @@ var mapModule = (function(window,$){
 
 	/*Global variables within the module scope*/
     var _mapContainer;
-	var _mapboxBaseMapCode = 'datasf.j9b9ihf0';
+	var _mapboxBaseMapCode = 'lightfox.1n10e3dp';
 	var _components = {
 	    "map": null,
 		"layers": {
@@ -39,7 +39,7 @@ var mapModule = (function(window,$){
 	}
 
     function _drawMap(){
-        L.mapbox.accessToken = 'pk.eyJ1IjoiZGF0YXNmIiwiYSI6Ilo3bVlHRDQifQ.7gkiPnZtioL8CnCvJ5z9Bg';
+        L.mapbox.accessToken = 'pk.eyJ1IjoibGlnaHRmb3giLCJhIjoiY2l1aHN5NzNsMDAwejJ6cGU2amY1NTMwdiJ9.rv8L848G_hvDZAoedNHw1Q';
 
 		//Create our map instance
 		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapboxBaseMapCode).setView([37.767806, -122.438153], 12);

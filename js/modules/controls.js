@@ -20,6 +20,7 @@ var controlsModule = (function(window, $) {
             _controlBarContainer = domContainer;
 
             _setDataUpdated();
+            _setDraggingMouse();
 
             //Wire events
             $('.typeahead').typeahead({
@@ -198,6 +199,40 @@ var controlsModule = (function(window, $) {
         } else {
             console.log("Lower controls container doesn't exist");
         }
+    }
+
+    function _setDraggingMouse() {
+        var isDragging = false;
+        var isCursorOverPin = false;
+        var mapComponent = mapModule.getComponents()["map"]; //map
+        var pinFeatureLayer = mapModule.getComponents()["layers"]["user"]; //FeatureLayer(pin)
+        pinFeatureLayer.on("mouseover", function(e) { isCursorOverPin = true; });
+        pinFeatureLayer.on("mouseout", function(e) { isCursorOverPin = false; });
+
+        var diffLatlng = L.latLng(0.0, 0.0);
+        mapComponent.on("mousedown", function(e) {
+            if (isCursorOverPin) {
+                userLatlng = pinFeatureLayer.getGeoJSON().geometry.coordinates;
+                diffLatlng.lat = userLatlng[1] - e.latlng.lat;
+                diffLatlng.lng = userLatlng[0] - e.latlng.lng;
+                isDragging = true;
+                mapComponent.dragging.disable();
+            }
+        });
+        mapComponent.on("mouseup", function(e) {
+            isDragging = false;
+            mapComponent.dragging.enable();
+            console.log(pinFeatureLayer.getGeoJSON().geometry.coordinates);
+            //Search, again!!
+        });
+
+        mapComponent.on("mousemove", function(e) {
+            if (!isDragging) return;
+            current_geojson = pinFeatureLayer.getGeoJSON();
+            current_geojson.geometry.coordinates[0] = e.latlng.lng + diffLatlng.lng;
+            current_geojson.geometry.coordinates[1] = e.latlng.lat + diffLatlng.lat;
+            pinFeatureLayer.setGeoJSON(current_geojson);
+        });
     }
 
     /**

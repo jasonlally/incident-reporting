@@ -132,6 +132,14 @@ var mapModule = (function(window,$){
 		return _components["layers"]["searchradius"].getRadius();
 	}
 
+	function _setComponents(components){
+        _components = components;
+    }
+
+	function _getComponents(){
+		return _components;
+	}
+
 	function _showLoader(){
         _mapContainer.find(".loading").show();
 	}
@@ -147,6 +155,8 @@ var mapModule = (function(window,$){
   		getUserSearchRadius:_getUserSearchRadius,
   		setUserSearchRadius:_setUserSearchRadius,
   		getUserLocation: _getUserLocation,
+  		setComponents: _setComponents,
+  		getComponents: _getComponents,
   		drawApiResponse:_drawApiResponse,
   		showLoader: _showLoader,
   		hideLoader: _hideLoader

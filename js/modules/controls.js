@@ -13,127 +13,16 @@ var controlsModule = (function(window, $) {
      * @param {object} domContainer
      */
     function _init(domContainer, domContainer2) {
-
-        //Initialize the module here
         if (!!domContainer) {
-            //Yeah - it does exist
             _controlBarContainer = domContainer;
-
             _setDataUpdated();
             _setDraggingMouse();
 
-            //Wire events
-            $('.typeahead').typeahead({
-      				source: function (query, process) {
-      					addresses = [];
-      					resourcesModule.getAutoSuggestionsFromService(query, function(data){
-      						$.each(data, function (i, address) {
-      							addresses.push(address.text);
-      						});
-      						process(addresses);
-      					});
-      				},
-      				updater: function(item) {
-      					clickedIndex = $('.typeahead').find('.active').index();
-      					controlsModule.setSuggestionsListContent(clickedIndex);
-      					return item;
-      				},
-      				minLength: 4, items: 10
-      			})
-
-            _controlBarContainer.find('#range-slider').noUiSlider({
-                start: [urlSearch.getRadius("ft")],
-                step: 1,
-                connect: 'lower',
-                range: {
-                    'min': [0],
-                    'max': [5280]
-                }
-            });
-
-            _controlBarContainer.find('#range-slider').on({
-                "slide": function() {
-                    mapModule.setUserSearchRadius($(this).val() * .3048);
-                },
-                "change": function() {
-                    var userLocation = mapModule.getUserLocation();
-                    urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()) // push search results into url
-                    var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-                    mapModule.showLoader();
-
-                    resourcesModule.getIncidentsFromAPI(query, function(data) {
-                        //data - is a FeatureCollection with an array "features"
-                        mapModule.drawApiResponse(data);
-                        _refreshDownloadButtonURLs(query);
-                        _loadDataToTable(query);
-                    });
-                },
-                "set": function() {
-                    mapModule.setUserSearchRadius($(this).val() * .3048);
-                    var userLocation = mapModule.getUserLocation();
-                    urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()) // push search results into url
-                    var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-                    mapModule.showLoader();
-
-                    resourcesModule.getIncidentsFromAPI(query, function(data) {
-                        //data - is a FeatureCollection with an array "features"
-                        mapModule.drawApiResponse(data);
-                        _refreshDownloadButtonURLs(query);
-                        _loadDataToTable(query);
-                    });
-                }
-            });
-
-            _controlBarContainer.find("#range-slider").Link('lower').to($('#range-slider-input'), null, wNumb({
-                decimals: 0
-            }));
-
-            _options["startDate"] = moment().subtract(29, 'days').format('YYYY-MM-DD');
-            _options["endDate"] = moment().format('YYYY-MM-DD');
-
-            _controlBarContainer.find('#daterange').val(urlSearch.getStartDate().format('MM/DD/YYYY') + ' - ' + urlSearch.getEndDate().format('MM/DD/YYYY'));
-
-            _controlBarContainer.find('#daterange').daterangepicker({
-                    ranges: {
-                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                        'This Month': [moment().startOf('month'), moment().endOf('month')],
-                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                        'This Quarter': [moment().startOf('quarter'), moment().endOf('quarter')],
-                        'Last Quarter': [moment().subtract(3, 'months').startOf('quarter'), moment().subtract(3, 'months').endOf('quarter')],
-                        'This Year': [moment().startOf('year'), moment()],
-                        'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-                    },
-                    startDate: urlSearch.getStartDate() || moment().subtract(29, 'days'), // OR isn't needed here, but would then totally depend on urlSearch module
-                    endDate: urlSearch.getEndDate() || moment(), // OR isn't needed here, but would then totally depend on urlSearch module
-                    format: 'MM/DD/YYYY'
-                },
-                function(start, end) {
-                    _options["startDate"] = start.format('YYYY-MM-DD');
-                    _options["endDate"] = end.format('YYYY-MM-DD');
-                    _controlBarContainer.find('#daterange').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
-
-                    //Start the API call
-                    var userLocation = mapModule.getUserLocation();
-
-                    urlSearch.urlPushSearch(userLocation, _options, null) // push search results into url
-
-                    var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-                    mapModule.showLoader();
-
-                    resourcesModule.getIncidentsFromAPI(query, function(data) {
-                        //data - is a FeatureCollection with an array "features"
-                        mapModule.drawApiResponse(data);
-                        _refreshDownloadButtonURLs(query);
-                        _loadDataToTable(query);
-                    });
-                });
-
+            _setInputAddress();
+            _setSlider();
+            _setDateRange();
         } else {
-            //Error
-            console.log("Upper controls container doesn't exist");
+            console.log("Upper controls container doesn't exist"); //Error
         }
 
         if (!!domContainer2) {
@@ -201,33 +90,122 @@ var controlsModule = (function(window, $) {
         }
     }
 
+    function _setInputAddress() {
+        $('.typeahead').typeahead({
+            source: function (query, process) {
+              addresses = [];
+              resourcesModule.getAutoSuggestionsFromService(query, function(data){
+                  $.each(data, function (i, address) {
+                      addresses.push(address.text);
+                  });
+                  process(addresses);
+              });
+            },
+            updater: function(item) {
+                clickedIndex = $('.typeahead').find('.active').index();
+                var acFeatures = resourcesModule.getLatestAutocompleteFeatures();
+
+                //Use the map module to change the user pin's location
+                mapModule.plotUserLocation(acFeatures[clickedIndex]);
+                mapModule.centerMapOnLocation(acFeatures[clickedIndex]);
+
+                //Hide the suggestions list
+                $(this).parent().hide();
+                controlsModule.searchCrime();
+                return item;
+            },
+            minLength: 4, items: 10
+        });
+    }
+
+    function _setSlider() {
+        _controlBarContainer.find('#range-slider').noUiSlider({
+            start: [urlSearch.getRadius("ft")],
+            step: 1,
+            connect: 'lower',
+            range: {
+                'min': [0],
+                'max': [5280]
+            }
+        });
+        _controlBarContainer.find('#range-slider').on({
+            "slide": function() {
+                mapModule.setUserSearchRadius($(this).val() * .3048);
+            },
+            "change": function() {
+                controlsModule.searchCrime(null, mapModule.getUserSearchRadius());
+            },
+            "set": function() {
+                mapModule.setUserSearchRadius($(this).val() * .3048);
+                controlsModule.searchCrime(null, mapModule.getUserSearchRadius());
+            }
+        });
+        _controlBarContainer.find("#range-slider").Link('lower').to($('#range-slider-input'), null, wNumb({
+            decimals: 0
+        }));
+    }
+
+
+    function _setDateRange() {
+        _options["startDate"] = moment().subtract(29, 'days').format('YYYY-MM-DD');
+        _options["endDate"] = moment().format('YYYY-MM-DD');
+
+        _controlBarContainer.find('#daterange').val(urlSearch.getStartDate().format('MM/DD/YYYY') + ' - ' + urlSearch.getEndDate().format('MM/DD/YYYY'));
+
+        _controlBarContainer.find('#daterange').daterangepicker({
+                ranges: {
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Quarter': [moment().startOf('quarter'), moment().endOf('quarter')],
+                    'Last Quarter': [moment().subtract(3, 'months').startOf('quarter'), moment().subtract(3, 'months').endOf('quarter')],
+                    'This Year': [moment().startOf('year'), moment()],
+                    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+                },
+                startDate: urlSearch.getStartDate() || moment().subtract(29, 'days'), // OR isn't needed here, but would then totally depend on urlSearch module
+                endDate: urlSearch.getEndDate() || moment(), // OR isn't needed here, but would then totally depend on urlSearch module
+                format: 'MM/DD/YYYY'
+            },
+            function(start, end) {
+                _options["startDate"] = start.format('YYYY-MM-DD');
+                _options["endDate"] = end.format('YYYY-MM-DD');
+                _controlBarContainer.find('#daterange').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
+
+                controlsModule.searchCrime(_options, null);
+            });
+    }
+
+
     function _setDraggingMouse() {
-        var isDragging = false;
-        var isCursorOverPin = false;
+        var isDraggingOnPin = false;
+        var isCursorOnPin = false;
         var mapComponent = mapModule.getComponents()["map"]; //map
         var pinFeatureLayer = mapModule.getComponents()["layers"]["user"]; //FeatureLayer(pin)
-        pinFeatureLayer.on("mouseover", function(e) { isCursorOverPin = true; });
-        pinFeatureLayer.on("mouseout", function(e) { isCursorOverPin = false; });
+        pinFeatureLayer.on("mouseover", function(e) { isCursorOnPin = true; });
+        pinFeatureLayer.on("mouseout", function(e) { isCursorOnPin = false; });
 
         var diffLatlng = L.latLng(0.0, 0.0);
         mapComponent.on("mousedown", function(e) {
-            if (isCursorOverPin) {
+            if (isCursorOnPin) {
+                isDraggingOnPin = true;
                 userLatlng = pinFeatureLayer.getGeoJSON().geometry.coordinates;
                 diffLatlng.lat = userLatlng[1] - e.latlng.lat;
                 diffLatlng.lng = userLatlng[0] - e.latlng.lng;
-                isDragging = true;
                 mapComponent.dragging.disable();
             }
         });
         mapComponent.on("mouseup", function(e) {
-            isDragging = false;
+            if (!isDraggingOnPin) return;
             mapComponent.dragging.enable();
-            console.log(pinFeatureLayer.getGeoJSON().geometry.coordinates);
-            //Search, again!!
+            console.log(pinFeatureLayer.getGeoJSON());
+            mapModule.plotUserLocation(pinFeatureLayer.getGeoJSON());
+            mapModule.centerMapOnLocation(pinFeatureLayer.getGeoJSON());
+            controlsModule.searchCrime();
+            isDraggingOnPin = false;
         });
 
         mapComponent.on("mousemove", function(e) {
-            if (!isDragging) return;
+            if (!isDraggingOnPin) return;
             current_geojson = pinFeatureLayer.getGeoJSON();
             current_geojson.geometry.coordinates[0] = e.latlng.lng + diffLatlng.lng;
             current_geojson.geometry.coordinates[1] = e.latlng.lat + diffLatlng.lat;
@@ -255,25 +233,11 @@ var controlsModule = (function(window, $) {
         });
     }
 
-    /**
-     * @param {number} clickedIndex
-     */
-    function _setSuggestionsListContent(clickedIndex) {
-
-        //Assign the returned autocomplete values to a variable
-        var acFeatures = resourcesModule.getLatestAutocompleteFeatures();
-
-        //Use the map module to change the user pin's location
-        mapModule.plotUserLocation(acFeatures[clickedIndex]);
-        mapModule.centerMapOnLocation(acFeatures[clickedIndex]);
-
-        //Hide the suggestions list
-        $(this).parent().hide();
-
+    function _searchCrime(options, radious) {
         //Start the API call
         var userLocation = mapModule.getUserLocation();
 
-        urlSearch.urlPushSearch(userLocation, _options, mapModule.getUserSearchRadius()) // push search results into url
+        urlSearch.urlPushSearch(userLocation, options, radious); // push search results into url
 
         var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
 
@@ -306,7 +270,7 @@ var controlsModule = (function(window, $) {
 
     return {
         init: _init,
-        setSuggestionsListContent: _setSuggestionsListContent,
+        searchCrime: _searchCrime,
         getEndDate: _getEndDate,
         getStartDate: _getStartDate,
         refreshDownloadButtonURLs: _refreshDownloadButtonURLs,

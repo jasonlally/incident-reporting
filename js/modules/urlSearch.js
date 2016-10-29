@@ -48,16 +48,17 @@ var urlSearch = (function(){
       })
     }
     if (dates) {
-      searchInput = Object.assign(searchInput, dates)
+      searchInput = Object.assign(searchInput, dates);
     }
     if (radius) {
-      radius = radius.toFixed(0)
-      searchInput = Object.assign(searchInput, {radius: radius})
+      radius = radius.toFixed(0);
+      searchInput = Object.assign(searchInput, {radius: radius});
     }
-    uri.setSearch(searchInput)
+
+    uri.setSearch(searchInput);
     newSearch = uri.build();
 
-    history.pushState(null, '', newSearch)
+    history.pushState(null, '', newSearch);
   }
 
   function _getStartDate() {

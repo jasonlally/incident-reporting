@@ -2,7 +2,8 @@ var mapModule = (function(window,$){
 
 	/*Global variables within the module scope*/
     var _mapContainer;
-	var _mapboxBaseMapCode = 'lightfox.1n10e3dp';
+    var _mapboxID = 'lightfox.1n10e3dp';
+    var _mapboxAccessToken = 'pk.eyJ1IjoibGlnaHRmb3giLCJhIjoiY2l1aHN5NzNsMDAwejJ6cGU2amY1NTMwdiJ9.rv8L848G_hvDZAoedNHw1Q';
 	var _components = {
 	    "map": null,
 		"layers": {
@@ -39,10 +40,10 @@ var mapModule = (function(window,$){
 	}
 
     function _drawMap(){
-        L.mapbox.accessToken = 'pk.eyJ1IjoibGlnaHRmb3giLCJhIjoiY2l1aHN5NzNsMDAwejJ6cGU2amY1NTMwdiJ9.rv8L848G_hvDZAoedNHw1Q';
+        L.mapbox.accessToken = _mapboxAccessToken;
 
 		//Create our map instance
-		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapboxBaseMapCode).setView([37.767806, -122.438153], 12);
+		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapboxID).setView([37.767806, -122.438153], 12);
 		_components["layers"]["searchradius"] = L.circle([37.767806, -122.438153], 402.3).addTo(_components["map"]);
 
 		//Plot the initial user location
@@ -140,6 +141,10 @@ var mapModule = (function(window,$){
 		return _components;
 	}
 
+    function _getMapboxAccessToken() {
+        return _mapboxAccessToken;
+    }
+
 	function _showLoader(){
         _mapContainer.find(".loading").show();
 	}
@@ -157,6 +162,7 @@ var mapModule = (function(window,$){
   		getUserLocation: _getUserLocation,
   		setComponents: _setComponents,
   		getComponents: _getComponents,
+        getMapboxAccessToken: _getMapboxAccessToken,
   		drawApiResponse:_drawApiResponse,
   		showLoader: _showLoader,
   		hideLoader: _hideLoader

@@ -20,6 +20,9 @@ var urlSearch = (function(){
       //assign the selected values to the address and radius fields
       $('#inputAddress').val(search);
 
+      //Here
+      //controlsModule.searchCrime(null, mapModule.getUserSearchRadius());
+      
       //Start the API call
       var userLocation = mapModule.getUserLocation();
       var query = "?$where=date >= '" + controlsModule.getStartDate() + "' AND date <= '" + controlsModule.getEndDate() + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
@@ -32,13 +35,13 @@ var urlSearch = (function(){
           controlsModule.refreshDownloadButtonURLs(query);
           controlsModule.loadDataToTable(query);
       });
-    })
+    });
   }
 
   function _urlPushSearch(locationResult, dates, radius) {
     var newSearch = null;
     var uri = new URI();
-    var searchInput = {}
+    var searchInput = {};
     if (locationResult) {
       searchInput = Object.assign(searchInput, {
         address: locationResult.properties.name,
@@ -64,7 +67,7 @@ var urlSearch = (function(){
   function _getStartDate() {
     var uri = new URI();
     uri = uri.search(true);
-    var date = uri.startDate ? moment(uri.startDate) : moment().subtract(29, 'days')
+    var date = uri.startDate ? moment(uri.startDate) : moment().subtract(29, 'days');
     return date;
   }
 
@@ -80,11 +83,11 @@ var urlSearch = (function(){
     uri = uri.search(true);
     if (uri.radius) {
       result = (unit === "ft") ? uri.radius * 3.28084 : uri.radius;
-      result = result.toFixed(0)
+      result = result.toFixed(0);
     } else {
       result = 1320;
     }
-    return result
+    return result;
   }
 
   return {

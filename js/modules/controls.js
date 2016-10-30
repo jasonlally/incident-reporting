@@ -197,10 +197,15 @@ var controlsModule = (function(window, $) {
         mapComponent.on("mouseup", function(e) {
             if (!isDraggingOnPin) return;
             mapComponent.dragging.enable();
-            console.log(pinFeatureLayer.getGeoJSON());
             mapModule.plotUserLocation(pinFeatureLayer.getGeoJSON());
             mapModule.centerMapOnLocation(pinFeatureLayer.getGeoJSON());
             controlsModule.searchCrime();
+
+            var coordinates = pinFeatureLayer.getGeoJSON().geometry.coordinates;
+            resourcesModule.reverseGeocoding(coordinates, function(response) {
+                address = response.features[0].place_name;
+                console.log(address);
+            });
             isDraggingOnPin = false;
         });
 
@@ -255,7 +260,6 @@ var controlsModule = (function(window, $) {
         var query = "?$select=date,time&$limit=1&$order=date DESC,time DESC";
         var datasetRequest = resourcesModule.getDatasetJsonURL(query);
         $.getJSON(datasetRequest, function(data) {
-            console.log(data)
             $('#data-updated').html('<b>Data available through ' + moment(data[0].date).format('MMMM DD, YYYY') + ' at ' + moment(data[0].time, 'HH:mm').format('hh:mm a') + '</b>')
         });
     }

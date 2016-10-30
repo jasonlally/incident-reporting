@@ -96,32 +96,39 @@ var resourcesModule = (function(window, $) {
         });
     }
 
-		/**
-		 * @param {string} address
-		 */
-		function _getJustAddress(address) {
-			var params = {
-	      api_key: 'search-kz-89WY',
-	      text: address,
-      };
+    /**
+     * @param {string} address
+     */
+    function _getJustAddress(address) {
+        var params = {
+            api_key: 'search-kz-89WY',
+            text: address,
+        };
 
-			return $.getJSON("//search.mapzen.com/v1/search", params);
-		}
+        return $.getJSON("//search.mapzen.com/v1/search", params);
+    }
 
     function _getLatestAutocompleteFeatures() {
         return _resources["autoCompleteFeatures"];
     }
 
+
+    function _reverseGeocoding(coordinates, callback) {
+        var params = {access_token: mapModule.getMapboxAccessToken()};
+        $.getJSON("//api.mapbox.com/v4/geocode/mapbox.places/" + coordinates[0] + "," + coordinates[1] + ".json.json", params, callback);
+    }
+
     return {
         init: _init,
         getAutoSuggestionsFromService: _getAutoSuggestionsFromService,
-				getJustAddress: _getJustAddress,
+        getJustAddress: _getJustAddress,
         getLatestAutocompleteFeatures: _getLatestAutocompleteFeatures,
         getIncidentsFromAPI: _getIncidentsFromAPI,
         getCsvLink: _getCsvLink,
         getCartoDbUrl: _getCartoDbUrl,
         getGeojsonio: _getGeojsonio,
         getDatasetJsonURL: _getDatasetJsonURL,
+        reverseGeocoding: _reverseGeocoding,
         setEmailLink: _setEmailLink
     }
 })(window, jQuery);

@@ -39,7 +39,7 @@ var mapModule = (function(window,$){
 	}
 
     function _drawMap(){
-        L.mapbox.accessToken = 'pk.eyJ1IjoibGlnaHRmb3giLCJhIjoiY2l1aHN5NzNsMDAwejJ6cGU2amY1NTMwdiJ9.rv8L848G_hvDZAoedNHw1Q';
+        L.mapbox.accessToken = 'pk.eyJ1IjoiY3JpbWVkYXRhc2YiLCJhIjoiY2l2Y296YTl2MDE2bTJ0cGI1NGoyY2RzciJ9.DRX-7gKkJy4FT2Q1Qybb2w';
 
 		//Create our map instance
 		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapboxBaseMapCode).setView([37.767806, -122.438153], 12);

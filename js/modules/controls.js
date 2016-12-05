@@ -116,15 +116,18 @@ var controlsModule = (function(window, $) {
                     "url": "empty.json",
                     "dataSrc": ""
                 },
-                "dom": '<"table-buttons"<"table-buttons"Bl>f>t<"table-buttons"ip>',
-                "buttons":['colvis'],
+                "dom": '<"table-buttons"<"table-buttons"Bf>l>t<"table-buttons"ip>',
+                "oLanguage": {
+                   "sSearch": "Filter results:"
+                 },
+                "buttons": [{ extend: 'colvis', text: 'Select Columns'}],
                 "fixedHeader": {
                     header: true,
                     footer: true
                 },
                 "columns": [{
                   "data": "incidntnum",
-                  "title": "Incident #",
+                  "title": "Incident#",
                   "name": "incidntnum",
                 }, {
                   "data": "date",
@@ -150,6 +153,7 @@ var controlsModule = (function(window, $) {
                   "name": "pddistrict",
                   "visible": false
                 }, {
+                  "className": "mobile",
                   "data": "category",
                   "title": "Category",
                   "name": "category",
@@ -158,6 +162,7 @@ var controlsModule = (function(window, $) {
                   "title": "Description",
                   "name": "descript",
                 }, {
+                  "className": "mobile tablet",
                   "data": "resolution",
                   "title": "Resolution",
                   "name": "resolution",

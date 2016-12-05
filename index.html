@@ -9,8 +9,8 @@
         <meta name="author" content="">
         <link rel="icon" href="../../favicon.ico">
 
-        <title>SFPD Incident Reports Map</title>
-
+        <title>SF Crime Data</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Franklin:300,400,500|Montserrat">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css">
         <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.2.1/css/buttons.dataTables.min.css">
@@ -35,18 +35,27 @@
 
             <div class="starter-template">
                 <div class="row">
-                    <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-                        <h1>Map SFPD Incident Reports</h1>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                         <p id="beta">* Beta test *</p>
                     </div>
-                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                          <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#myModal">
+                        <button type="button" id="feedback-btn" class="hidden-xs btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myModal">
+                          Leave Feedback
+                        </button>
+                        <button type="button" id="feedback-btn" class="visible-xs btn btn-primary btn-xs pull-right" data-toggle="modal" data-target="#myModal">
                           Leave Feedback
                         </button>
                     </div>
                 </div>
-                <div id="data-updated"></div>
-                <div id="sfim-controls" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>San Francisco Crime Data</h1>
+                        <h2>SFPD data provided by <a href="https://data.sfgov.org/" target="_blank">SF OpenData</a></h2>   
+                    </div>
+                </div>
+                
+                    <div id="sfim-controls" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div id="address-control" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group" id="searchgroup">
                             <label for="inputAddress">Address</label>
@@ -62,6 +71,7 @@
                     <div id="slider-control" class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-group">
                             <div class="slider-body">
+                                <label for="range-slider">Adjust Radius</label>
                                 <div id="range-slider"></div>
                             </div>
                         </div>
@@ -70,6 +80,7 @@
                         <div class="form-group">
                             <label for="select-time">Time period</label>
                             <input id="daterange" type="text" class="form-control">
+                            <div class="subheader" id="data-updated"></div>
                         </div>
                     </div>
                 </div>
@@ -112,7 +123,7 @@
                     </div>
                 </div>
                 <div id="sfim-table" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">
-                    <table id="example" class="display table" cellspacing="0" width="100%">
+                    <table id="example" class="display table table-responsive" data-min="11" cellspacing="0" width="100%">
                         <tfoot>
                           <tr>
 
@@ -124,9 +135,9 @@
 
             <div style="clear: both"></div>
             
-            <footer class="small">
+            <!-- <footer class="small">
               <p>Data from <a href="https://data.sfgov.org/" target="_blank">SF OpenData</a>.</p>
-            </footer>
+            </footer> -->
             
             <!-- Feedback Modal -->
             <div class="modal fade" id="myModal" role="dialog" tabindex="-1">

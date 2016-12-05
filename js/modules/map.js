@@ -74,7 +74,8 @@ var mapModule = (function(window,$){
                 var marker = layer;
                 var feature = marker.feature;
 
-                var popupContent = feature.properties.category;
+                var popupContent = feature.properties.descript + "; INCIDENT #: " + feature.properties.incidntnum;
+                 // + "; Resolution: " + feature.properties.resolution
 
                 marker.bindPopup(popupContent);
             });

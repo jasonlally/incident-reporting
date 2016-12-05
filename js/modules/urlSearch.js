@@ -21,8 +21,12 @@ var urlSearch = (function(){
       $('#inputAddress').val(search);
 
       //Start the API call
+      var startDate = uri.startDate || controlsModule.getStartDate();
+      var endDate = uri.endDate || controlsModule.getEndDate();
       var userLocation = mapModule.getUserLocation();
-      var query = "?$where=date >= '" + controlsModule.getStartDate() + "' AND date <= '" + controlsModule.getEndDate() + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
+
+      var query = "?$where=date >= '" + startDate + "' AND date <= '" + endDate + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC&$limit=100000";
+
 
       mapModule.showLoader();
 

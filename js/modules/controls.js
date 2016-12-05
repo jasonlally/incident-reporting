@@ -57,31 +57,13 @@ var controlsModule = (function(window, $) {
                 "change": function() {
                     var userLocation = mapModule.getUserLocation();
                     urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()) // push search results into url
-                    var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-                    mapModule.showLoader();
-
-                    resourcesModule.getIncidentsFromAPI(query, function(data) {
-                        //data - is a FeatureCollection with an array "features"
-                        mapModule.drawApiResponse(data);
-                        _refreshDownloadButtonURLs(query);
-                        _loadDataToTable(query);
-                    });
+                    _loadRadialIncidentData();
                 },
                 "set": function() {
                     mapModule.setUserSearchRadius($(this).val() * .3048);
                     var userLocation = mapModule.getUserLocation();
-                    urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()) // push search results into url
-                    var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-                    mapModule.showLoader();
-
-                    resourcesModule.getIncidentsFromAPI(query, function(data) {
-                        //data - is a FeatureCollection with an array "features"
-                        mapModule.drawApiResponse(data);
-                        _refreshDownloadButtonURLs(query);
-                        _loadDataToTable(query);
-                    });
+                    urlSearch.urlPushSearch(userLocation, null, mapModule.getUserSearchRadius()); // push search results into url
+                    _loadRadialIncidentData();
                 }
             });
 
@@ -118,16 +100,7 @@ var controlsModule = (function(window, $) {
 
                     urlSearch.urlPushSearch(userLocation, _options, null) // push search results into url
 
-                    var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-                    mapModule.showLoader();
-
-                    resourcesModule.getIncidentsFromAPI(query, function(data) {
-                        //data - is a FeatureCollection with an array "features"
-                        mapModule.drawApiResponse(data);
-                        _refreshDownloadButtonURLs(query);
-                        _loadDataToTable(query);
-                    });
+                    _loadRadialIncidentData();
                 });
 
         } else {
@@ -201,26 +174,6 @@ var controlsModule = (function(window, $) {
     }
 
     /**
-     * @param {string} query
-     */
-    function _refreshDownloadButtonURLs(query) {
-        _controlBarLowerContainer.find("#download-csv").attr("href", resourcesModule.getCsvLink(query));
-        _controlBarLowerContainer.find("#open-geojsonio").attr("href", resourcesModule.getGeojsonio(query));
-        _controlBarLowerContainer.find("#open-cartodb").attr("href", resourcesModule.getCartoDbUrl(query));
-        _controlBarLowerContainer.find("#email-share").attr("href", resourcesModule.setEmailLink());
-    }
-
-    /**
-     * @param {string} query
-     */
-    function _loadDataToTable(query) {
-        var datasetURL = resourcesModule.getDatasetJsonURL(query);
-        _table.ajax.url(datasetURL).load(function(data){
-          // console.log("data", data);
-        });
-    }
-
-    /**
      * @param {number} clickedIndex
      */
     function _setSuggestionsListContent(clickedIndex) {
@@ -237,19 +190,10 @@ var controlsModule = (function(window, $) {
 
         //Start the API call
         var userLocation = mapModule.getUserLocation();
+        var radius = mapModule.getUserSearchRadius();
 
-        urlSearch.urlPushSearch(userLocation, _options, mapModule.getUserSearchRadius()) // push search results into url
-
-        var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-        mapModule.showLoader();
-
-        resourcesModule.getIncidentsFromAPI(query, function(data) {
-            //data - is a FeatureCollection with an array "features"
-            mapModule.drawApiResponse(data);
-            _refreshDownloadButtonURLs(query);
-            _loadDataToTable(query);
-        });
+        urlSearch.urlPushSearch(userLocation, _options, radius); // push search results into url
+        _loadRadialIncidentData();
     }
 
     function _setDataUpdated() {
@@ -267,6 +211,53 @@ var controlsModule = (function(window, $) {
 
     function _getEndDate() {
         return _options["endDate"];
+    }
+
+    function _loadRadialIncidentData() {
+        var query = _buildRadialIncidentDataQuery();
+
+        mapModule.showLoader();
+        resourcesModule.getIncidentsFromAPI(query, function(data) {
+            mapModule.drawApiResponse(data);
+            _refreshDownloadButtonURLs(query);
+            _loadDataToTable(query);
+        });
+    }
+
+    function _buildRadialIncidentDataQuery() {
+        var startDate = _options.startDate;
+        var endDate = _options.endDate;
+        var coordinates = mapModule.getUserLocation().geometry.coordinates;
+        var longitude = coordinates[0];
+        var latitude = coordinates[1];
+        var radius = mapModule.getUserSearchRadius();
+
+        return "?$where="
+          + "date >= '" + startDate + "'"
+          + " AND date <= '" + endDate + "'"
+          + " AND within_circle(location," +  latitude + "," + longitude + "," + radius + ")"
+          + "&$order=date DESC"
+          + "&$limit=100000";
+    }
+
+    /**
+     * @param {string} query
+     */
+    function _refreshDownloadButtonURLs(query) {
+        _controlBarLowerContainer.find("#download-csv").attr("href", resourcesModule.getCsvLink(query));
+        _controlBarLowerContainer.find("#open-geojsonio").attr("href", resourcesModule.getGeojsonio(query));
+        _controlBarLowerContainer.find("#open-cartodb").attr("href", resourcesModule.getCartoDbUrl(query));
+        _controlBarLowerContainer.find("#email-share").attr("href", resourcesModule.setEmailLink());
+    }
+
+    /**
+     * @param {string} query
+     */
+    function _loadDataToTable(query) {
+        var datasetURL = resourcesModule.getDatasetJsonURL(query);
+        _table.ajax.url(datasetURL).load(function(data){
+          // console.log("data", data);
+        });
     }
 
     return {

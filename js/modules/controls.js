@@ -17,7 +17,6 @@ var controlsModule = (function(window, $) {
             _controlBarContainer = domContainer;
             _setDataUpdated();
             _setDraggingMouse();
-
             _setInputAddress();
             _setSlider();
             _setDateRange();
@@ -33,15 +32,18 @@ var controlsModule = (function(window, $) {
                     "url": "empty.json",
                     "dataSrc": ""
                 },
-                "dom": '<"table-buttons"<"table-buttons"Bl>f>t<"table-buttons"ip>',
-                "buttons":['colvis'],
+                "dom": '<"table-buttons"<"table-buttons"Bf>l>t<"table-buttons"ip>',
+                "oLanguage": {
+                   "sSearch": "Filter results:"
+                 },
+                "buttons": [{ extend: 'colvis', text: 'Select Columns'}],
                 "fixedHeader": {
                     header: true,
                     footer: true
                 },
                 "columns": [{
                   "data": "incidntnum",
-                  "title": "Incident #",
+                  "title": "Incident#",
                   "name": "incidntnum",
                 }, {
                   "data": "date",
@@ -67,6 +69,7 @@ var controlsModule = (function(window, $) {
                   "name": "pddistrict",
                   "visible": false
                 }, {
+                  "className": "mobile",
                   "data": "category",
                   "title": "Category",
                   "name": "category",
@@ -75,6 +78,7 @@ var controlsModule = (function(window, $) {
                   "title": "Description",
                   "name": "descript",
                 }, {
+                  "className": "mobile tablet",
                   "data": "resolution",
                   "title": "Resolution",
                   "name": "resolution",
@@ -89,6 +93,7 @@ var controlsModule = (function(window, $) {
             console.log("Lower controls container doesn't exist");
         }
     }
+
 
     function _setInputAddress() {
         $('.typeahead').typeahead({
@@ -239,21 +244,13 @@ var controlsModule = (function(window, $) {
     }
 
     function _searchCrime(options, radious) {
+
         //Start the API call
         var userLocation = mapModule.getUserLocation();
+        var radius = mapModule.getUserSearchRadius();
 
-        urlSearch.urlPushSearch(userLocation, options, radious); // push search results into url
-
-        var query = "?$where=date >= '" + _options["startDate"] + "' AND date <= '" + _options["endDate"] + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC";
-
-        mapModule.showLoader();
-
-        resourcesModule.getIncidentsFromAPI(query, function(data) {
-            //data - is a FeatureCollection with an array "features"
-            mapModule.drawApiResponse(data);
-            _refreshDownloadButtonURLs(query);
-            _loadDataToTable(query);
-        });
+        urlSearch.urlPushSearch(userLocation, options, radius); // push search results into url
+        _loadRadialIncidentData();
     }
 
     function _setDataUpdated() {
@@ -270,6 +267,53 @@ var controlsModule = (function(window, $) {
 
     function _getEndDate() {
         return _options["endDate"];
+    }
+
+    function _loadRadialIncidentData() {
+        var query = _buildRadialIncidentDataQuery();
+
+        mapModule.showLoader();
+        resourcesModule.getIncidentsFromAPI(query, function(data) {
+            mapModule.drawApiResponse(data);
+            _refreshDownloadButtonURLs(query);
+            _loadDataToTable(query);
+        });
+    }
+
+    function _buildRadialIncidentDataQuery() {
+        var startDate = _options.startDate;
+        var endDate = _options.endDate;
+        var coordinates = mapModule.getUserLocation().geometry.coordinates;
+        var longitude = coordinates[0];
+        var latitude = coordinates[1];
+        var radius = mapModule.getUserSearchRadius();
+
+        return "?$where="
+          + "date >= '" + startDate + "'"
+          + " AND date <= '" + endDate + "'"
+          + " AND within_circle(location," +  latitude + "," + longitude + "," + radius + ")"
+          + "&$order=date DESC"
+          + "&$limit=100000";
+    }
+
+    /**
+     * @param {string} query
+     */
+    function _refreshDownloadButtonURLs(query) {
+        _controlBarLowerContainer.find("#download-csv").attr("href", resourcesModule.getCsvLink(query));
+        _controlBarLowerContainer.find("#open-geojsonio").attr("href", resourcesModule.getGeojsonio(query));
+        _controlBarLowerContainer.find("#open-cartodb").attr("href", resourcesModule.getCartoDbUrl(query));
+        _controlBarLowerContainer.find("#email-share").attr("href", resourcesModule.setEmailLink());
+    }
+
+    /**
+     * @param {string} query
+     */
+    function _loadDataToTable(query) {
+        var datasetURL = resourcesModule.getDatasetJsonURL(query);
+        _table.ajax.url(datasetURL).load(function(data){
+          // console.log("data", data);
+        });
     }
 
     return {

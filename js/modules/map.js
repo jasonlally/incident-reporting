@@ -3,7 +3,7 @@ var mapModule = (function(window,$){
 	/*Global variables within the module scope*/
     var _mapContainer;
     var _mapboxID = 'lightfox.1n10e3dp';
-    var _mapboxAccessToken = 'pk.eyJ1IjoibGlnaHRmb3giLCJhIjoiY2l1aHN5NzNsMDAwejJ6cGU2amY1NTMwdiJ9.rv8L848G_hvDZAoedNHw1Q';
+    var _mapboxAccessToken = 'pk.eyJ1IjoiY3JpbWVkYXRhc2YiLCJhIjoiY2l2Y296YTl2MDE2bTJ0cGI1NGoyY2RzciJ9.DRX-7gKkJy4FT2Q1Qybb2w';
 	var _components = {
 	    "map": null,
 		"layers": {
@@ -75,7 +75,8 @@ var mapModule = (function(window,$){
                 var marker = layer;
                 var feature = marker.feature;
 
-                var popupContent = feature.properties.category;
+                var popupContent = feature.properties.descript + "; INCIDENT #: " + feature.properties.incidntnum;
+                 // + "; Resolution: " + feature.properties.resolution
 
                 marker.bindPopup(popupContent);
             });

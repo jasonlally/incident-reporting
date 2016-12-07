@@ -9,8 +9,8 @@
         <meta name="author" content="">
         <link rel="icon" href="../../favicon.ico">
 
-        <title>SFPD Incident Reports Map</title>
-
+        <title>SF Crime Data</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Libre+Franklin:300,400,500|Montserrat">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css">
         <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.2.1/css/buttons.dataTables.min.css">
@@ -34,10 +34,28 @@
         <div class="container">
 
             <div class="starter-template">
-                <h1>Map SFPD Incident Reports</h1>
-                <div id="data-updated"></div>
-
-                <div id="sfim-controls" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                         <p id="beta">* Beta test *</p>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                         <!-- Button trigger modal -->
+                        <button type="button" id="feedback-btn" class="hidden-xs btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myModal">
+                          Leave Feedback
+                        </button>
+                        <button type="button" id="feedback-btn" class="visible-xs btn btn-primary btn-xs pull-right" data-toggle="modal" data-target="#myModal">
+                          Leave Feedback
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>San Francisco Crime Data</h1>
+                        <h2>SFPD data provided by <a href="https://data.sfgov.org/" target="_blank">SF OpenData</a></h2>   
+                    </div>
+                </div>
+                
+                    <div id="sfim-controls" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div id="address-control" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group" id="searchgroup">
                             <label for="inputAddress">Address</label>
@@ -53,6 +71,7 @@
                     <div id="slider-control" class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-group">
                             <div class="slider-body">
+                                <label for="range-slider">Adjust Radius</label>
                                 <div id="range-slider"></div>
                             </div>
                         </div>
@@ -61,6 +80,7 @@
                         <div class="form-group">
                             <label for="select-time">Time period</label>
                             <input id="daterange" type="text" class="form-control">
+                            <div class="subheader" id="data-updated"></div>
                         </div>
                     </div>
                 </div>
@@ -103,7 +123,7 @@
                     </div>
                 </div>
                 <div id="sfim-table" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding:0px !important;">
-                    <table id="example" class="display table" cellspacing="0" width="100%">
+                    <table id="example" class="display table table-responsive" data-min="11" cellspacing="0" width="100%">
                         <tfoot>
                           <tr>
 
@@ -114,13 +134,73 @@
             </div>
 
             <div style="clear: both"></div>
-
-            <footer class="small">
+            
+            <!-- <footer class="small">
               <p>Data from <a href="https://data.sfgov.org/" target="_blank">SF OpenData</a>.</p>
-            </footer>
-
-        </div>
-
+            </footer> -->
+            
+            <!-- Feedback Modal -->
+            <div class="modal fade" id="myModal" role="dialog" tabindex="-1">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Feedback</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="https://formspree.io/crime.data.sf@gmail.com" method="post">
+                                <div>
+                                    <p>Please provide your email address so we can contact you with any questions. We will not share your information or spam you.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputName">Name</label> 
+                                    <input type="text" id="inputName" class="form-control" name="name" placeholder="Jane Doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail">Email</label> 
+                                    <input type="email" id="inputEmail" class="form-control" name="email" placeholder="jane.doe@example.com">
+                                </div>
+                                <label>Is this website easy to use?</label>
+                                <br>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Is this website easy to use?" value="yes"> Yes
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Is this website easy to use?" value="somewhat"> Somewhat
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Is this website easy to use?" value="no"> No
+                                </label>
+                                <div class="form-group"></div>
+                                <label>How likely are you to use this website for professional or personal needs?</label>
+                                <label class="radio-inline">
+                                  <input type="radio" value="highly-likely" name="How likely are you to use?"> Highly likely
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" value="somewhat-likely" name="How likely are you to use?"> Somewhat likely
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" value="unlikely" name="How likely are you to use?"> Unlikely
+                                </label>
+                                <div class="form-group"></div>
+                                <div class="form-group">
+                                    <p>If you selected 'No' or 'Unlikely' above, please tell us how we can improve.</p>
+                                    <label for="textArea">Comments</label> 
+                                    <textarea class="form-control" id="textArea" name="general comments" rows="4"></textarea>
+                                </div>
+                                <div>
+                                    <!-- This hidden input field is to thrwart scrapers -->
+                                    <input name="_gotcha" style="display: none" type="text">
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button> <button class="btn btn-primary" type="submit" value="Send">Send</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+             </div>
+            
         <!-- Load jQuery from Google's CDN, so that it is likely to be already in the client's cache -->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
@@ -151,8 +231,8 @@
         <script>
 
             /**
-		    Lets start the whole application from a jQuery document.ready event
-		*/
+            Lets start the whole application from a jQuery document.ready event
+        */
             $(document).ready(function() {
 
                 //Start the resources module with a Promise first so that all resources we might ever need would be loaded

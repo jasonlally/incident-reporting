@@ -116,7 +116,7 @@ var controlsModule = (function(window, $) {
 
                 //Hide the suggestions list
                 $(this).parent().hide();
-                controlsModule.searchCrime();
+                controlsModule.searchCrime(mapModule.getUserLocation());
                 return item;
             },
             minLength: 4, items: 10
@@ -138,11 +138,11 @@ var controlsModule = (function(window, $) {
                 mapModule.setUserSearchRadius($(this).val() * .3048);
             },
             "change": function() {
-                controlsModule.searchCrime(null, mapModule.getUserSearchRadius());
+                controlsModule.searchCrime(mapModule.getUserLocation());
             },
             "set": function() {
                 mapModule.setUserSearchRadius($(this).val() * .3048);
-                controlsModule.searchCrime(null, mapModule.getUserSearchRadius());
+                controlsModule.searchCrime(mapModule.getUserLocation());
             }
         });
         _controlBarContainer.find("#range-slider").Link('lower').to($('#range-slider-input'), null, wNumb({
@@ -176,7 +176,7 @@ var controlsModule = (function(window, $) {
                 _options["endDate"] = end.format('YYYY-MM-DD');
                 _controlBarContainer.find('#daterange').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
 
-                controlsModule.searchCrime(_options, null);
+                controlsModule.searchCrime(mapModule.getUserLocation());
             });
     }
 
@@ -202,14 +202,21 @@ var controlsModule = (function(window, $) {
         mapComponent.on("mouseup", function(e) {
             if (!isDraggingOnPin) return;
             mapComponent.dragging.enable();
-            mapModule.plotUserLocation(pinFeatureLayer.getGeoJSON());
-            mapModule.centerMapOnLocation(pinFeatureLayer.getGeoJSON());
-            controlsModule.searchCrime();
+            var newGeoJson = pinFeatureLayer.getGeoJSON();
+            mapModule.plotUserLocation(newGeoJson);
+            mapModule.centerMapOnLocation(newGeoJson);
 
             var coordinates = pinFeatureLayer.getGeoJSON().geometry.coordinates;
             resourcesModule.reverseGeocoding(coordinates, function(response) {
-                address = response.features[0].place_name;
-                console.log(address);
+                var address = response.features[0].place_name;
+                var newUserLocation = response.features[0];
+                newGeoJson.properties.name = address.split(', ')[0];
+                newGeoJson.properties.locality = response.features[1].text;
+                newGeoJson.properties.region = response.features[3].text;
+                newGeoJson.properties.postalcode = response.features[2].text;
+                address = newGeoJson.properties.name + ', ' + newGeoJson.properties.locality + ', ' + newGeoJson.properties.region;
+                clickedIndex = $('.typeahead').val(address);
+                controlsModule.searchCrime(newGeoJson);
             });
             isDraggingOnPin = false;
         });
@@ -243,13 +250,13 @@ var controlsModule = (function(window, $) {
         });
     }
 
-    function _searchCrime(options, radious) {
+    function _searchCrime(userLocation) {
 
         //Start the API call
-        var userLocation = mapModule.getUserLocation();
+        //var userLocation = mapModule.getUserLocation();
         var radius = mapModule.getUserSearchRadius();
 
-        urlSearch.urlPushSearch(userLocation, options, radius); // push search results into url
+        urlSearch.pushIntoUrl(userLocation, _options, radius); // push search results into url
         _loadRadialIncidentData();
     }
 

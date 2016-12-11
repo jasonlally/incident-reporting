@@ -47,7 +47,7 @@ var mapModule = (function(window,$){
 		_components["layers"]["searchradius"] = L.circle([37.767806, -122.438153], 402.3).addTo(_components["map"]);
 
 		//Plot the initial user location
-		_components["layers"]["user"].setGeoJSON({ "type": "Feature","properties": {"marker-size": "large"}, "geometry": {"type": "Point", "coordinates": [-122.438153,37.767806]}});
+        _setUserLocation({ "type": "Feature","properties": {"marker-size": "large"}, "geometry": {"type": "Point", "coordinates": [-122.438153,37.767806]}});
 
 		//Add all layers to the map instance
 		_enableAllLayers();
@@ -106,10 +106,14 @@ var mapModule = (function(window,$){
       * @param {object} feature
     */
 	function _plotUserLocation(feature){
-	    _components["layers"]["user"].setGeoJSON(feature);	
+        _setUserLocation(feature);
 		_components["layers"]["searchradius"].setLatLng([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
 		_components["layers"]["searchradius"].setRadius(_getUserSearchRadius());
 	}
+
+	function _setUserLocation(geoJson){
+	    _components["layers"]["user"].setGeoJSON(geoJson);
+    }
 
 	function _getUserLocation(){
 	    return _components["layers"]["user"].getGeoJSON();
@@ -160,6 +164,7 @@ var mapModule = (function(window,$){
   		centerMapOnLocation: _centerMapOnLocation,
   		getUserSearchRadius:_getUserSearchRadius,
   		setUserSearchRadius:_setUserSearchRadius,
+  		setUserLocation: _setUserLocation,
   		getUserLocation: _getUserLocation,
   		setComponents: _setComponents,
   		getComponents: _getComponents,

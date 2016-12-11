@@ -119,6 +119,25 @@ var controlsModule = (function(window, $) {
                 controlsModule.searchCrime(mapModule.getUserLocation());
                 return item;
             },
+            matcher: function (item) {
+                return true; //set candidate list of addresses at "typehead"
+            },
+            highlighter: function(item) {
+                var queries = $.grep(this.query.split(" "), function(x){return x;}); //remove empty string
+                var ii=0, back_ii=0;
+                var res = "";
+
+                queries.forEach(function(a_query) {
+                    ii = item.toLowerCase().indexOf(a_query.toLowerCase(), back_ii); //ii: index of item
+                    if (ii < 0) { return; }
+                    var a_str = item.substr(ii, a_query.length);
+                    var highlight_str = '<strong>' + item.substr(ii, a_str.length) + '</strong>';
+                    res += item.substr(back_ii, ii - back_ii) + highlight_str;
+                    back_ii = ii + a_str.length;
+                });
+                res += item.substr(back_ii, item.length - ii);
+                return res;
+            },
             minLength: 4, items: 10
         });
     }

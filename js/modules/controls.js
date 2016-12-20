@@ -225,6 +225,10 @@ var controlsModule = (function(window, $) {
             mapModule.plotUserLocation(newGeoJson);
             mapModule.centerMapOnLocation(newGeoJson);
 
+            isDraggingOnPin = false;
+
+            controlsModule.searchCrime(newGeoJson);
+            
             var coordinates = pinFeatureLayer.getGeoJSON().geometry.coordinates;
             resourcesModule.reverseGeocoding(coordinates, function(response) {
                 var address = response.features[0].place_name;
@@ -235,9 +239,8 @@ var controlsModule = (function(window, $) {
                 newGeoJson.properties.postalcode = response.features[2].text;
                 address = newGeoJson.properties.name + ', ' + newGeoJson.properties.locality + ', ' + newGeoJson.properties.region;
                 clickedIndex = $('.typeahead').val(address);
-                controlsModule.searchCrime(newGeoJson);
             });
-            isDraggingOnPin = false;
+
         });
 
         mapComponent.on("mousemove", function(e) {

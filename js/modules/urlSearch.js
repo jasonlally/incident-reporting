@@ -1,100 +1,85 @@
+var urlSearch = (function() {
 
-var urlSearch = (function(){
+    function _runURLsearch() {
+        var uri = new URI();
+        uri = uri.query(true);
 
-  function _runURLsearch(){
-    var uri = new URI();
-    uri = uri.query(true);
+        var search = uri.address + ", " + uri.city + ", " + uri.state;
 
-    var search = uri.address + ", " + uri.city + ", " + uri.state + ", " + uri.zip
+        //Assign the returned autocomplete values to a variable
+        var addressCall = resourcesModule.getJustAddress(search);
 
-    //Assign the returned autocomplete values to a variable
-    var addressCall = resourcesModule.getJustAddress(search);
+        addressCall.done(function(data){
+            //Use the map module to change the user pin's location
+            mapModule.plotUserLocation(data.features[0]);
+            mapModule.centerMapOnLocation(data.features[0]);
+            mapModule.setUserSearchRadius(uri.radius);
 
-    addressCall.done(function(data){
+            //assign the selected values to the address and radius fields
+            $('#inputAddress').val(search);
 
-      //Use the map module to change the user pin's location
-      mapModule.plotUserLocation(data.features[0]);
-      mapModule.centerMapOnLocation(data.features[0]);
-      mapModule.setUserSearchRadius(uri.radius);
-
-      //assign the selected values to the address and radius fields
-      $('#inputAddress').val(search);
-
-      //Start the API call
-      var startDate = uri.startDate || controlsModule.getStartDate();
-      var endDate = uri.endDate || controlsModule.getEndDate();
-      var userLocation = mapModule.getUserLocation();
-
-      var query = "?$where=date >= '" + startDate + "' AND date <= '" + endDate + "' AND within_circle(location," + userLocation["geometry"]["coordinates"][1] + "," + userLocation["geometry"]["coordinates"][0] + "," + mapModule.getUserSearchRadius() + ")&$order=date DESC&$limit=100000";
-
-
-      mapModule.showLoader();
-
-      resourcesModule.getIncidentsFromAPI(query, function(data) {
-          //data - is a FeatureCollection with an array "features"
-          mapModule.drawApiResponse(data);
-          controlsModule.refreshDownloadButtonURLs(query);
-          controlsModule.loadDataToTable(query);
-      });
-    })
-  }
-
-  function _urlPushSearch(locationResult, dates, radius) {
-    var newSearch = null;
-    var uri = new URI();
-    var searchInput = {}
-    if (locationResult) {
-      searchInput = Object.assign(searchInput, {
-        address: locationResult.properties.name,
-        city: locationResult.properties.locality,
-        state: locationResult.properties.region_a,
-        zip: locationResult.properties.postalcode
-      })
+            controlsModule.searchCrime();
+        });
     }
-    if (dates) {
-      searchInput = Object.assign(searchInput, dates)
+
+    function _pushIntoUrl(userLocation, dates, radius) {
+        var newSearch = null;
+        var uri = new URI();
+        var searchInput = {};
+
+        if (userLocation) {
+            searchInput = Object.assign(searchInput, {
+                address: userLocation.properties.name,
+                city: userLocation.properties.locality,
+                state: userLocation.properties.region,
+                zip: userLocation.properties.postalcode
+            })
+        }
+        if (dates) {
+            searchInput = Object.assign(searchInput, dates);
+        }
+        if (radius) {
+            radius = radius.toFixed(0);
+            searchInput = Object.assign(searchInput, {radius: radius});
+        }
+
+        uri.setSearch(searchInput);
+        newSearch = uri.build();
+
+        history.pushState(null, '', newSearch);
     }
-    if (radius) {
-      radius = radius.toFixed(0)
-      searchInput = Object.assign(searchInput, {radius: radius})
+
+    function _getStartDate() {
+        var uri = new URI();
+        uri = uri.search(true);
+        var date = uri.startDate ? moment(uri.startDate) : moment().subtract(29, 'days');
+        return date;
     }
-    uri.setSearch(searchInput)
-    newSearch = uri.build();
 
-    history.pushState(null, '', newSearch)
-  }
-
-  function _getStartDate() {
-    var uri = new URI();
-    uri = uri.search(true);
-    var date = uri.startDate ? moment(uri.startDate) : moment().subtract(29, 'days')
-    return date;
-  }
-
-  function _getEndDate() {
-    var uri = new URI();
-    uri = uri.search(true);
-    return moment(uri.endDate);
-  }
-
-  function _getRadius(unit){
-    var result = null;
-    var uri = new URI();
-    uri = uri.search(true);
-    if (uri.radius) {
-      result = (unit === "ft") ? uri.radius * 3.28084 : uri.radius;
-      result = result.toFixed(0)
-    } else {
-      result = 1320;
+    function _getEndDate() {
+        var uri = new URI();
+        uri = uri.search(true);
+        return moment(uri.endDate);
     }
-    return result
-  }
 
-  return {
-    runURLsearch: _runURLsearch,
-    urlPushSearch: _urlPushSearch,
-    getStartDate: _getStartDate,
-    getEndDate: _getEndDate,
-    getRadius: _getRadius
-  }
-})()
+    function _getRadius(unit){
+        var result = null;
+        var uri = new URI();
+        uri = uri.search(true);
+        if (uri.radius) {
+            result = (unit === "ft") ? uri.radius * 3.28084 : uri.radius;
+            result = result.toFixed(0);
+        } else {
+            result = 1320;
+        }
+        return result;
+    }
+
+    return {
+        runURLsearch: _runURLsearch,
+        pushIntoUrl: _pushIntoUrl,
+        getStartDate: _getStartDate,
+        getEndDate: _getEndDate,
+        getRadius: _getRadius
+    }
+})(window, jQuery);

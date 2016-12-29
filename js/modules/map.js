@@ -2,7 +2,7 @@ var mapModule = (function(window,$){
 
 	/*Global variables within the module scope*/
     var _mapContainer;
-    var _mapboxID = 'lightfox.1n10e3dp';
+    var _mapDesignID = 'mapbox.streets';
     var _mapboxAccessToken = 'pk.eyJ1IjoiY3JpbWVkYXRhc2YiLCJhIjoiY2l2Y296YTl2MDE2bTJ0cGI1NGoyY2RzciJ9.DRX-7gKkJy4FT2Q1Qybb2w';
 	var _components = {
 	    "map": null,
@@ -43,7 +43,7 @@ var mapModule = (function(window,$){
         L.mapbox.accessToken = _mapboxAccessToken;
 
 		//Create our map instance
-		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapboxID).setView([37.767806, -122.438153], 12);
+		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapDesignID).setView([37.767806, -122.438153], 12);
 		_components["layers"]["searchradius"] = L.circle([37.767806, -122.438153], 402.3).addTo(_components["map"]);
 
 		//Plot the initial user location

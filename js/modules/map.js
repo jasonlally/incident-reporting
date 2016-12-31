@@ -1,156 +1,123 @@
-var mapModule = (function(window,$){
+var mapModule = (function(window,$) {
 
-	/*Global variables within the module scope*/
-    var _mapContainer;
-	var _mapboxBaseMapCode = 'lightfox.1n10e3dp';
-	var _components = {
-	    "map": null,
-		"layers": {
-		    "user": L.mapbox.featureLayer(),
-			"searchradius": null,
-			"incidents": L.mapbox.featureLayer()
-		},
-		"cluster": new L.MarkerClusterGroup({"showCoverageOnHover": false})
+    var MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiY3JpbWVkYXRhc2YiLCJhIjoiY2l2Y296YTl2MDE2bTJ0cGI1NGoyY2RzciJ9.DRX-7gKkJy4FT2Q1Qybb2w';
+    var MAPBOX_MAP_STYLE_ID = 'lightfox.1n10e3dp';
+    var MAP_CONTAINER_ELEMENT_ID = 'map';
+    
+    var SEARCH_MARKER_GEOJSON = {
+        type: 'Feature',
+        geometry: { type: 'Point' },
+        properties: { 'marker-size': 'large' }
+    };
+
+    var INCIDENT_MARKER_PROPERTIES = {
+		'marker-color': '#000080',
+		'marker-symbol': 'police',
+		'marker-size': 'small'
 	};
 
-    /**
-      * @param {object} domContainer
-    */
-	function _init(domContainer){
+	var SHAPE_STYLE_SETTINGS = {
+		color: '#0033ff',
+		fillColor: '#0033ff',
+		weight: 5,
+		fillOpacity: 0.2,
+		opacity: 0.5
+	};
 
-	    //Initialize the module here
-		if(!!domContainer){
-		    //Yeah - it does exist
-           _mapContainer = domContainer;
-           _drawMap();
+	var DRAW_CONTROL_SETTINGS = {
+		draw: {
+			polyline: false,
+			polygon: { shapeOptions: SHAPE_STYLE_SETTINGS },
+			rectangle: { shapeOptions: SHAPE_STYLE_SETTINGS },
+			circle: false,
+			marker: false
 		}
-		else
-		{
-		    //Error
-		    alert("Sidebar container doesn't exist");
-		}
+	};
+
+    var searchAreaGroup = L.featureGroup();
+    var incidentLayer = L.mapbox.featureLayer();
+   	var incidentClusterGroup = new L.MarkerClusterGroup({ showCoverageOnHover: false });
+
+    var map;
+
+	function _init() {
+        L.mapbox.accessToken = MAPBOX_ACCESS_TOKEN;
+        map = L.mapbox.map(MAP_CONTAINER_ELEMENT_ID, MAPBOX_MAP_STYLE_ID);
+
+		var drawControl = new L.Control.Draw(DRAW_CONTROL_SETTINGS).addTo(map);
+		searchAreaGroup.addTo(map);
+		incidentLayer.addTo(map);
+		incidentClusterGroup.addTo(map);
+
+		map.on('draw:created', _afterDraw);
+    }
+
+	function _afterDraw(e) {
+		viewModelModule.searchShapeType = 'polygon';
+		viewModelModule.searchGeoJson = e.layer.toGeoJSON();
+		pageModule.loadIncidentData();
 	}
 
-	function _enableAllLayers(){
-	    for(i in _components["layers"]){
-			console.log();
-			_components["layers"][i].addTo(_components["map"]);
-		}
+	function _drawPolygonIncidents(incidentGeoJson) {
+		_drawPolygonSearchArea();
+		_drawIncidents(incidentGeoJson);
 	}
 
-    function _drawMap(){
-        L.mapbox.accessToken = 'pk.eyJ1IjoiY3JpbWVkYXRhc2YiLCJhIjoiY2l2Y296YTl2MDE2bTJ0cGI1NGoyY2RzciJ9.DRX-7gKkJy4FT2Q1Qybb2w';
-
-		//Create our map instance
-		_components["map"] = L.mapbox.map(_mapContainer.prop("id"), _mapboxBaseMapCode).setView([37.767806, -122.438153], 12);
-		_components["layers"]["searchradius"] = L.circle([37.767806, -122.438153], 402.3).addTo(_components["map"]);
-
-		//Plot the initial user location
-		_components["layers"]["user"].setGeoJSON({ "type": "Feature","properties": {"marker-size": "large"}, "geometry": {"type": "Point", "coordinates": [-122.438153,37.767806]}});
-
-		//Add all layers to the map instance
-		_enableAllLayers();
-
+	function _drawRadialIncidents(incidentGeoJson) {
+		_drawRadialSearchArea();
+		_drawIncidents(incidentGeoJson);
 	}
 
-    /**
-      * @param {object} response
-    */
-	function _drawApiResponse(response){
-	    if(response["features"].length>0){
-		    //Color all incident records to RED
-			for(i=0;i<response["features"].length;i++){
-			    response["features"][i]["properties"] = $.extend({}, response["features"][i]["properties"], {"marker-color": "#000080", "marker-symbol": "police", "marker-size": "small"});
-			}
-
-			//Clear the cluster contents
-			_components["cluster"].clearLayers();
-
-			//Set the map content based on the information coming from the API response
-			_components["layers"]["incidents"].setGeoJSON(response);
-
-            _components["layers"]["incidents"].eachLayer(function(layer) {
-                _components["cluster"].addLayer(layer);
-                var marker = layer;
-                var feature = marker.feature;
-
-                var popupContent = feature.properties.descript + "; INCIDENT #: " + feature.properties.incidntnum;
-                 // + "; Resolution: " + feature.properties.resolution
-
-                marker.bindPopup(popupContent);
-            });
-
-			_components["map"].addLayer(_components["cluster"]);
-
-			_components["layers"]["incidents"].clearLayers();
-		}
-		else
-		{
-		    //We received no results from the API, delete map contents
-			_components["layers"]["incidents"].clearLayers();
-			
-			//Clear the clusters from the map as well, not just the feature layer
-			_components["cluster"].clearLayers();
-			
-		}
-
-		//Set map bounds to the bounds of the search radius
-		_components["map"].fitBounds(_components["layers"]["searchradius"].getBounds());
-
-		//Hide the loader screen
-		_hideLoader();
+	function _drawPolygonSearchArea() {
+		var searchAreaGeoJson = viewModelModule.searchGeoJson;
+		var searchAreaLayer = L.mapbox.featureLayer(searchAreaGeoJson)
+			.setStyle(SHAPE_STYLE_SETTINGS);
+		searchAreaGroup.clearLayers()
+            .addLayer(searchAreaLayer);
 	}
 
-    /**
-      * @param {object} feature
-    */
-	function _plotUserLocation(feature){
-	    _components["layers"]["user"].setGeoJSON(feature);	
-		_components["layers"]["searchradius"].setLatLng([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
-		_components["layers"]["searchradius"].setRadius(_getUserSearchRadius());
-	}
+    function _drawRadialSearchArea() {
+		var latitude = viewModelModule.latitude,
+			longitude = viewModelModule.longitude,
+			radius = viewModelModule.searchRadius;
 
-	function _getUserLocation(){
-	    return _components["layers"]["user"].getGeoJSON();
-	}
+		searchAreaGroup.clearLayers();
 
-    /**
-      * @param {object} feature
-    */
-	function _centerMapOnLocation(feature){
-	    _components["map"].setView([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], 14);
-	}
+		var searchMarkerGeoJson = $.extend(true, {}, SEARCH_MARKER_GEOJSON, {
+			geometry: { coordinates: [ longitude, latitude ] }
+		});
 
-    /**
-      * @param {number} meters
-    */
-	function _setUserSearchRadius(meters){
-	    _components["layers"]["searchradius"].setRadius(parseFloat(meters));
-		return _components["layers"]["searchradius"].getRadius();
-	}
+        var searchMarkerLayer = L.mapbox.featureLayer(searchMarkerGeoJson);
+		var searchAreaLayer = L.circle([latitude, longitude], radius);
 
-	function _getUserSearchRadius(){
-		return _components["layers"]["searchradius"].getRadius();
-	}
+		searchAreaGroup.addLayer(searchMarkerLayer)
+			.addLayer(searchAreaLayer);
+    }
 
-	function _showLoader(){
-        _mapContainer.find(".loading").show();
-	}
+    function _buildIncidentPopupContent(properties) {
+		return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
+    }
 
-	function _hideLoader(){
-        _mapContainer.find(".loading").hide();
+	function _drawIncidents(incidentGeoJson) {
+		incidentClusterGroup.clearLayers();
+
+		$.each(incidentGeoJson.features, function(index, feature) {
+			$.extend(feature.properties, INCIDENT_MARKER_PROPERTIES);
+		});
+
+        incidentLayer.setGeoJSON(incidentGeoJson).eachLayer(function(layer) {
+            incidentClusterGroup.addLayer(layer);
+			layer.bindPopup(_buildIncidentPopupContent(layer.feature.properties));
+		});
+
+        incidentLayer.clearLayers();
+		map.fitBounds(searchAreaGroup.getBounds());
 	}
 
     return {
 	    init: _init,
-  		plotUserLocation: _plotUserLocation,
-  		centerMapOnLocation: _centerMapOnLocation,
-  		getUserSearchRadius:_getUserSearchRadius,
-  		setUserSearchRadius:_setUserSearchRadius,
-  		getUserLocation: _getUserLocation,
-  		drawApiResponse:_drawApiResponse,
-  		showLoader: _showLoader,
-  		hideLoader: _hideLoader
+		drawPolygonIncidents: _drawPolygonIncidents,
+  		drawRadialIncidents: _drawRadialIncidents
     };
 
 })(window, jQuery);

@@ -1,23 +1,23 @@
 var formModule = (function(window, $) {
 
     function _init() {
-		_initializeAddressSearchInput();
-		_initializeAddressSearchRadiusRangeSlider();
-		_initializeDateRange();
+        _initializeAddressSearchInput();
+        _initializeAddressSearchRadiusRangeSlider();
+        _initializeDateRange();
         _initializeLastUpdatedDateText();
     }
 
     function _initializeAddressSearchInput() {
         $('#inputAddress').typeahead({
-			source: addressService.getAddressSuggestions,
-      		minLength: 4,
-			items: 10,
-			display: 'text',
-			afterSelect: _afterAddressSelect
-      	});
-	}
+            source: addressService.getAddressSuggestions,
+              minLength: 4,
+            items: 10,
+            display: 'text',
+            afterSelect: _afterAddressSelect
+          });
+    }
 
-	function _initializeAddressSearchRadiusRangeSlider() {
+    function _initializeAddressSearchRadiusRangeSlider() {
         $('#range-slider').noUiSlider({
             start: 1320, //
             step: 1,
@@ -37,12 +37,12 @@ var formModule = (function(window, $) {
         .Link('lower').to($('#range-slider-input'), null, wNumb({
             decimals: 0
         }));
-	}
+    }
 
-	function _initializeDateRange() {
+    function _initializeDateRange() {
         var startDate = viewModelModule.startDate
-		  ? moment(viewModelModule.startDate)
-		  : moment().subtract(29, 'days');
+          ? moment(viewModelModule.startDate)
+          : moment().subtract(29, 'days');
         var endDate = viewModelModule.endDate
           ? moment(viewModelModule.endDate)
           : moment();
@@ -63,8 +63,8 @@ var formModule = (function(window, $) {
             endDate: endDate,
             format: 'MM/DD/YYYY'
         }, function(startDate, endDate) {
-			var formattedStartDate = startDate.format('YYYY-MM-DD');
-			var formattedEndDate = endDate.format('YYYY-MM-DD');
+            var formattedStartDate = startDate.format('YYYY-MM-DD');
+            var formattedEndDate = endDate.format('YYYY-MM-DD');
             viewModelModule.startDate = formattedStartDate;
             viewModelModule.endDate = formattedEndDate;
             $('#daterange').val(formattedStartDate + ' - ' + formattedEndDate);
@@ -84,18 +84,18 @@ var formModule = (function(window, $) {
     }
 
     function _afterAddressSelect(selectedOption) {
-		addressService.getAddress(selectedOption.name, function(address) {
-			var addressFeature = address.features[0];
+        addressService.getAddress(selectedOption.name, function(address) {
+            var addressFeature = address.features[0];
 
-			viewModelModule.latitude = addressFeature.geometry.coordinates[1];
-			viewModelModule.longitude = addressFeature.geometry.coordinates[0];
-			viewModelModule.searchAddress = addressFeature.properties.name;
-			viewModelModule.searchCity = addressFeature.properties.locality;
-			viewModelModule.searchState = addressFeature.region;
-			viewModelModule.searchZip = addressFeature.postalCode;
-			viewModelModule.searchShapeType = 'radial';
+            viewModelModule.latitude = addressFeature.geometry.coordinates[1];
+            viewModelModule.longitude = addressFeature.geometry.coordinates[0];
+            viewModelModule.searchAddress = addressFeature.properties.name;
+            viewModelModule.searchCity = addressFeature.properties.locality;
+            viewModelModule.searchState = addressFeature.region;
+            viewModelModule.searchZip = addressFeature.postalCode;
+            viewModelModule.searchShapeType = 'radial';
 
-			pageModule.loadIncidentData();
+            pageModule.loadIncidentData();
         });
     }
 

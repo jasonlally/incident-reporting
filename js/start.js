@@ -1,10 +1,10 @@
 $(document).ready(function() {
-  init();
+    init();
 
-  function init() {
-    formModule.init();
-    mapModule.init();
-    tableModule.init();
-    urlSearchModule.initializeViewModelFromUrlParameters();
-  }
+    function init() {
+        formModule.init();
+        mapModule.init();
+        tableModule.init();
+        urlSearchModule.initializeViewModelFromUrlParameters();
+    }
 });

@@ -2,8 +2,8 @@ var datasetLinksModule = (function(window, $) {
 
     function _getCartoDbUrl(query) {
         return "//oneclick.cartodb.com/?"
-		  + "file=" + encodeURIComponent(resourceEndpointsModule.INCIDENTS_API_GEOJSON_URL + query)
-		  + "&provider=DataSF";
+          + "file=" + encodeURIComponent(resourceEndpointsModule.INCIDENTS_API_GEOJSON_URL + query)
+          + "&provider=DataSF";
     }
 
     function _getCsvLink(query) {
@@ -12,7 +12,7 @@ var datasetLinksModule = (function(window, $) {
 
     function _getGeojsonio(query) {
         return "http://geojson.io/#"
-		  + "data=data:text/x-url,"+ encodeURIComponent(resourceEndpointsModule.INCIDENTS_API_GEOJSON_URL + query);
+          + "data=data:text/x-url,"+ encodeURIComponent(resourceEndpointsModule.INCIDENTS_API_GEOJSON_URL + query);
     }
 
     function _setEmailLink() {
@@ -28,7 +28,7 @@ var datasetLinksModule = (function(window, $) {
     }
 
     return {
-		refreshDownloadButtonUrls: _refreshDownloadButtonUrls
+        refreshDownloadButtonUrls: _refreshDownloadButtonUrls
     };
 
 })(window, jQuery);

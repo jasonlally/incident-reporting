@@ -69,20 +69,20 @@ var tableModule = (function(window, $) {
     }
 
     function _loadDataToTable(incidentGeoJson) {
-		_table.clear();
-		_table.rows.add(_convertGeoJsonToJson(incidentGeoJson));
+        _table.clear();
+        _table.rows.add(_convertGeoJsonToJson(incidentGeoJson));
         _table.draw();
     }
 
     function _convertGeoJsonToJson(geoJson) {
-		var json = [];
-		$.each(geoJson.features, function(index, feature) {
-			feature.properties.location = feature.geometry;
-			json.push(feature.properties);
-		});
+        var json = [];
+        $.each(geoJson.features, function(index, feature) {
+            feature.properties.location = feature.geometry;
+            json.push(feature.properties);
+        });
 
-		return json;
-	}
+        return json;
+    }
 
     return {
         init: _init,

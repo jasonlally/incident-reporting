@@ -1,13 +1,13 @@
 var pageModule = (function(window, $) {
 
-	function _loadIncidentData() {
-		switch(viewModelModule.searchShapeType) {
-			case 'polygon': _loadPolygonIncidentData(); break;
-			case 'radial': _loadRadialIncidentData(); break;
+    function _loadIncidentData() {
+        switch(viewModelModule.searchShapeType) {
+            case 'polygon': _loadPolygonIncidentData(); break;
+            case 'radial': _loadRadialIncidentData(); break;
 
-			default: _loadRadialIncidentData(); break;
-		}
-	}
+            default: _loadRadialIncidentData(); break;
+        }
+    }
 
     function _loadPolygonIncidentData() {
         var params = _buildPolygonIncidentSearchParameters();
@@ -22,20 +22,20 @@ var pageModule = (function(window, $) {
             mapModule.drawPolygonIncidents(incidentsGeoJson);
             tableModule.loadDataToTable(incidentsGeoJson);
         });
-	}
+    }
 
-	function _buildPolygonIncidentSearchParameters() {
-		return {
+    function _buildPolygonIncidentSearchParameters() {
+        return {
             startDate: viewModelModule.startDate,
             endDate: viewModelModule.endDate,
             searchGeoJson: viewModelModule.searchGeoJson
-		};
-	}
+        };
+    }
 
     function _loadRadialIncidentData() {
         var params = _buildRadialIncidentSearchParameters();
 
-		var query = incidentService.buildRadialIncidentDataQuery(params);
+        var query = incidentService.buildRadialIncidentDataQuery(params);
         datasetLinksModule.refreshDownloadButtonUrls(query);
         historyModule.saveSearchUrl();
 
@@ -43,18 +43,18 @@ var pageModule = (function(window, $) {
         incidentService.findIncidentsWithRadialSearch(params, 'geojson', function(geoJson) {
             _hideLoader();
             mapModule.drawRadialIncidents(geoJson);
-        	tableModule.loadDataToTable(geoJson);
+            tableModule.loadDataToTable(geoJson);
         });
     }
 
     function _buildRadialIncidentSearchParameters() {
-		return {
-			startDate: viewModelModule.startDate,
-			endDate: viewModelModule.endDate,
-			longitude: viewModelModule.longitude,
-			latitude: viewModelModule.latitude,
-			radius: viewModelModule.searchRadius
-		};
+        return {
+            startDate: viewModelModule.startDate,
+            endDate: viewModelModule.endDate,
+            longitude: viewModelModule.longitude,
+            latitude: viewModelModule.latitude,
+            radius: viewModelModule.searchRadius
+        };
     }
 
     function _showLoader() {

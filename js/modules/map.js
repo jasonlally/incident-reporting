@@ -11,113 +11,113 @@ var mapModule = (function(window,$) {
     };
 
     var INCIDENT_MARKER_PROPERTIES = {
-		'marker-color': '#000080',
-		'marker-symbol': 'police',
-		'marker-size': 'small'
-	};
+        'marker-color': '#000080',
+        'marker-symbol': 'police',
+        'marker-size': 'small'
+    };
 
-	var SHAPE_STYLE_SETTINGS = {
-		color: '#0033ff',
-		fillColor: '#0033ff',
-		weight: 5,
-		fillOpacity: 0.2,
-		opacity: 0.5
-	};
+    var SHAPE_STYLE_SETTINGS = {
+        color: '#0033ff',
+        fillColor: '#0033ff',
+        weight: 5,
+        fillOpacity: 0.2,
+        opacity: 0.5
+    };
 
-	var DRAW_CONTROL_SETTINGS = {
-		draw: {
-			polyline: false,
-			polygon: { shapeOptions: SHAPE_STYLE_SETTINGS },
-			rectangle: { shapeOptions: SHAPE_STYLE_SETTINGS },
-			circle: false,
-			marker: false
-		}
-	};
+    var DRAW_CONTROL_SETTINGS = {
+        draw: {
+            polyline: false,
+            polygon: { shapeOptions: SHAPE_STYLE_SETTINGS },
+            rectangle: { shapeOptions: SHAPE_STYLE_SETTINGS },
+            circle: false,
+            marker: false
+        }
+    };
 
     var searchAreaGroup = L.featureGroup();
     var incidentLayer = L.mapbox.featureLayer();
-   	var incidentClusterGroup = new L.MarkerClusterGroup({ showCoverageOnHover: false });
+       var incidentClusterGroup = new L.MarkerClusterGroup({ showCoverageOnHover: false });
 
     var map;
 
-	function _init() {
+    function _init() {
         L.mapbox.accessToken = MAPBOX_ACCESS_TOKEN;
         map = L.mapbox.map(MAP_CONTAINER_ELEMENT_ID, MAPBOX_MAP_STYLE_ID);
 
-		var drawControl = new L.Control.Draw(DRAW_CONTROL_SETTINGS).addTo(map);
-		searchAreaGroup.addTo(map);
-		incidentLayer.addTo(map);
-		incidentClusterGroup.addTo(map);
+        var drawControl = new L.Control.Draw(DRAW_CONTROL_SETTINGS).addTo(map);
+        searchAreaGroup.addTo(map);
+        incidentLayer.addTo(map);
+        incidentClusterGroup.addTo(map);
 
-		map.on('draw:created', _afterDraw);
+        map.on('draw:created', _afterDraw);
     }
 
-	function _afterDraw(e) {
-		viewModelModule.searchShapeType = 'polygon';
-		viewModelModule.searchGeoJson = e.layer.toGeoJSON();
-		pageModule.loadIncidentData();
-	}
+    function _afterDraw(e) {
+        viewModelModule.searchShapeType = 'polygon';
+        viewModelModule.searchGeoJson = e.layer.toGeoJSON();
+        pageModule.loadIncidentData();
+    }
 
-	function _drawPolygonIncidents(incidentGeoJson) {
-		_drawPolygonSearchArea();
-		_drawIncidents(incidentGeoJson);
-	}
+    function _drawPolygonIncidents(incidentGeoJson) {
+        _drawPolygonSearchArea();
+        _drawIncidents(incidentGeoJson);
+    }
 
-	function _drawRadialIncidents(incidentGeoJson) {
-		_drawRadialSearchArea();
-		_drawIncidents(incidentGeoJson);
-	}
+    function _drawRadialIncidents(incidentGeoJson) {
+        _drawRadialSearchArea();
+        _drawIncidents(incidentGeoJson);
+    }
 
-	function _drawPolygonSearchArea() {
-		var searchAreaGeoJson = viewModelModule.searchGeoJson;
-		var searchAreaLayer = L.mapbox.featureLayer(searchAreaGeoJson)
-			.setStyle(SHAPE_STYLE_SETTINGS);
-		searchAreaGroup.clearLayers()
+    function _drawPolygonSearchArea() {
+        var searchAreaGeoJson = viewModelModule.searchGeoJson;
+        var searchAreaLayer = L.mapbox.featureLayer(searchAreaGeoJson)
+            .setStyle(SHAPE_STYLE_SETTINGS);
+        searchAreaGroup.clearLayers()
             .addLayer(searchAreaLayer);
-	}
+    }
 
     function _drawRadialSearchArea() {
-		var latitude = viewModelModule.latitude,
-			longitude = viewModelModule.longitude,
-			radius = viewModelModule.searchRadius;
+        var latitude = viewModelModule.latitude,
+            longitude = viewModelModule.longitude,
+            radius = viewModelModule.searchRadius;
 
-		searchAreaGroup.clearLayers();
+        searchAreaGroup.clearLayers();
 
-		var searchMarkerGeoJson = $.extend(true, {}, SEARCH_MARKER_GEOJSON, {
-			geometry: { coordinates: [ longitude, latitude ] }
-		});
+        var searchMarkerGeoJson = $.extend(true, {}, SEARCH_MARKER_GEOJSON, {
+            geometry: { coordinates: [ longitude, latitude ] }
+        });
 
         var searchMarkerLayer = L.mapbox.featureLayer(searchMarkerGeoJson);
-		var searchAreaLayer = L.circle([latitude, longitude], radius);
+        var searchAreaLayer = L.circle([latitude, longitude], radius);
 
-		searchAreaGroup.addLayer(searchMarkerLayer)
-			.addLayer(searchAreaLayer);
+        searchAreaGroup.addLayer(searchMarkerLayer)
+            .addLayer(searchAreaLayer);
     }
 
     function _buildIncidentPopupContent(properties) {
-		return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
+        return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
     }
 
-	function _drawIncidents(incidentGeoJson) {
-		incidentClusterGroup.clearLayers();
+    function _drawIncidents(incidentGeoJson) {
+        incidentClusterGroup.clearLayers();
 
-		$.each(incidentGeoJson.features, function(index, feature) {
-			$.extend(feature.properties, INCIDENT_MARKER_PROPERTIES);
-		});
+        $.each(incidentGeoJson.features, function(index, feature) {
+            $.extend(feature.properties, INCIDENT_MARKER_PROPERTIES);
+        });
 
         incidentLayer.setGeoJSON(incidentGeoJson).eachLayer(function(layer) {
             incidentClusterGroup.addLayer(layer);
-			layer.bindPopup(_buildIncidentPopupContent(layer.feature.properties));
-		});
+            layer.bindPopup(_buildIncidentPopupContent(layer.feature.properties));
+        });
 
         incidentLayer.clearLayers();
-		map.fitBounds(searchAreaGroup.getBounds());
-	}
+        map.fitBounds(searchAreaGroup.getBounds());
+    }
 
     return {
-	    init: _init,
-		drawPolygonIncidents: _drawPolygonIncidents,
-  		drawRadialIncidents: _drawRadialIncidents
+        init: _init,
+        drawPolygonIncidents: _drawPolygonIncidents,
+        drawRadialIncidents: _drawRadialIncidents
     };
 
 })(window, jQuery);

@@ -1,4 +1,3 @@
-
 var addressService = (function(window, $) {
 
     var _lastAutocompleteQueryTime = moment();
@@ -34,18 +33,18 @@ var addressService = (function(window, $) {
         });
     }
 
-	function _getAddress(addressSearchText, callback) {
-		var params = {
-			api_key: 'search-kz-89WY',
-			text: addressSearchText
+    function _getAddress(addressSearchText, callback) {
+        var params = {
+            api_key: 'search-kz-89WY',
+            text: addressSearchText
         };
 
-		$.get("//search.mapzen.com/v1/search", params, callback);
-	}
+        $.get("//search.mapzen.com/v1/search", params, callback);
+    }
 
     return {
         getAddressSuggestions: _getAddressSuggestions,
-		getAddress: _getAddress
+        getAddress: _getAddress
     };
 
 })(window, jQuery);

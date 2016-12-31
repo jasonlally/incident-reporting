@@ -10,7 +10,7 @@ var formModule = (function(window, $) {
     function _initializeAddressSearchInput() {
         $('#inputAddress').typeahead({
             source: addressService.getAddressSuggestions,
-              minLength: 4,
+            minLength: 4,
             items: 10,
             display: 'text',
             afterSelect: _afterAddressSelect
@@ -23,8 +23,8 @@ var formModule = (function(window, $) {
             step: 1,
             connect: 'lower',
             range: {
-                'min': [0],
-                'max': [5280]
+                min: [0],
+                max: [5280]
             }
         })
         .on({

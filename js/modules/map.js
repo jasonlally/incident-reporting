@@ -36,7 +36,7 @@ var mapModule = (function(window,$) {
 
     var searchAreaGroup = L.featureGroup();
     var incidentLayer = L.mapbox.featureLayer();
-       var incidentClusterGroup = new L.MarkerClusterGroup({ showCoverageOnHover: false });
+    var incidentClusterGroup = new L.MarkerClusterGroup({ showCoverageOnHover: false });
 
     var map;
 
@@ -72,6 +72,7 @@ var mapModule = (function(window,$) {
         var searchAreaGeoJson = viewModelModule.searchGeoJson;
         var searchAreaLayer = L.mapbox.featureLayer(searchAreaGeoJson)
             .setStyle(SHAPE_STYLE_SETTINGS);
+
         searchAreaGroup.clearLayers()
             .addLayer(searchAreaLayer);
     }
@@ -81,8 +82,6 @@ var mapModule = (function(window,$) {
             longitude = viewModelModule.longitude,
             radius = viewModelModule.searchRadius;
 
-        searchAreaGroup.clearLayers();
-
         var searchMarkerGeoJson = $.extend(true, {}, SEARCH_MARKER_GEOJSON, {
             geometry: { coordinates: [ longitude, latitude ] }
         });
@@ -90,12 +89,9 @@ var mapModule = (function(window,$) {
         var searchMarkerLayer = L.mapbox.featureLayer(searchMarkerGeoJson);
         var searchAreaLayer = L.circle([latitude, longitude], radius);
 
-        searchAreaGroup.addLayer(searchMarkerLayer)
+        searchAreaGroup.clearLayers()
+            .addLayer(searchMarkerLayer)
             .addLayer(searchAreaLayer);
-    }
-
-    function _buildIncidentPopupContent(properties) {
-        return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
     }
 
     function _drawIncidents(incidentGeoJson) {
@@ -112,6 +108,10 @@ var mapModule = (function(window,$) {
 
         incidentLayer.clearLayers();
         map.fitBounds(searchAreaGroup.getBounds());
+    }
+
+    function _buildIncidentPopupContent(properties) {
+        return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
     }
 
     return {

@@ -12,12 +12,10 @@ var addressService = (function(window, $) {
 
         var timeDifference = moment(_lastAutocompleteQueryTime).diff(moment(), "milliseconds") * -1;
 
-        //console.log("Time since the last autocomplete rquest: " + timeDifference);
-
         if (timeDifference < 150) {
-            //console.log("You are typing too fast. Blocking requests.");
             return false;
         }
+
         _lastAutocompleteQueryTime = moment();
 
         $.getJSON("//search.mapzen.com/v1/autocomplete", params, function(data) {

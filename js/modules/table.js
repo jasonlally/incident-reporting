@@ -19,29 +19,6 @@ var tableModule = (function(window, $) {
             title: "Incident#",
             name: "incidntnum",
         }, {
-            data: "date",
-            title: "Date",
-            name: "date",
-            render: function(data, type, row, meta) {
-                return moment(data).format('l')
-            },
-            visible: false
-        }, {
-            data: "time",
-            title: "Time",
-            name: "time",
-            visible: false
-        }, {
-            data: "address",
-            title: "Address",
-            name: "address",
-            visible: false
-        }, {
-            data: "pddistrict",
-            title: "District",
-            name: "pddistrict",
-            visible: false
-        }, {
             className: "mobile",
             data: "category",
             title: "Category",
@@ -68,20 +45,10 @@ var tableModule = (function(window, $) {
         _table = $('#example').DataTable(TABLE_CONFIG);
     }
 
-    function _loadDataToTable(incidentGeoJson) {
+    function _loadDataToTable(incidentJson) {
         _table.clear();
-        _table.rows.add(_convertGeoJsonToJson(incidentGeoJson));
+        _table.rows.add(incidentJson);
         _table.draw();
-    }
-
-    function _convertGeoJsonToJson(geoJson) {
-        var json = [];
-        $.each(geoJson.features, function(index, feature) {
-            feature.properties.location = feature.geometry;
-            json.push(feature.properties);
-        });
-
-        return json;
     }
 
     return {

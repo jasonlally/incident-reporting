@@ -1,26 +1,37 @@
 var pageModule = (function(window, $) {
 
-    function _loadIncidentData() {
-        switch(viewModelModule.searchShapeType) {
-            case 'polygon': _loadPolygonIncidentData(); break;
-            case 'radial': _loadRadialIncidentData(); break;
+    var METERS_PER_FOOT = 0.3048;
+    var LOAD_INCIDENT_DATA_OPTION_DEFAULTS = {
+        pushState: true,
+        reverseGeocoding: shouldApplyReverseGeocoding
+    };
 
-            default: _loadRadialIncidentData(); break;
+    function _loadIncidentData(options) {
+        options = $.extend(true, {}, LOAD_INCIDENT_DATA_OPTION_DEFAULTS, options || {});
+
+        switch(viewModelModule.searchShapeType) {
+            case 'polygon': _loadPolygonIncidentData(options); break;
+            case 'radial': _loadRadialIncidentData(options); break;
+
+            default: _loadRadialIncidentData(options); break;
         }
     }
 
-    function _loadPolygonIncidentData() {
+    function _loadPolygonIncidentData(options) {
         var params = _buildPolygonIncidentSearchParameters();
 
         var query = incidentService.buildPolygonIncidentDataQuery(params);
         datasetLinksModule.refreshDownloadButtonUrls(query);
-        historyModule.saveSearchUrl();
+
+        if(options.pushState) {
+            historyModule.saveSearchUrl();
+        }
 
         _showLoader();
-        incidentService.findIncidentsWithPolygonSearch(params, 'geojson', function(incidentsGeoJson) {
+        incidentService.findIncidentsWithPolygonSearch(params, function(incidentsJson) {
             _hideLoader();
-            mapModule.drawPolygonIncidents(incidentsGeoJson);
-            tableModule.loadDataToTable(incidentsGeoJson);
+            mapModule.drawPolygonIncidents(_convertJsonToGeoJson(incidentsJson));
+            tableModule.loadDataToTable(incidentsJson);
         });
     }
 
@@ -32,18 +43,31 @@ var pageModule = (function(window, $) {
         };
     }
 
-    function _loadRadialIncidentData() {
+    function _loadRadialIncidentData(options) {
         var params = _buildRadialIncidentSearchParameters();
 
         var query = incidentService.buildRadialIncidentDataQuery(params);
         datasetLinksModule.refreshDownloadButtonUrls(query);
-        historyModule.saveSearchUrl();
+
+        if(options.pushState) {
+            historyModule.saveSearchUrl();
+        }
+
+        var shouldApplyAddressFromCoordinates =
+            typeof options.reverseGeocoding === 'function'
+            ? options.reverseGeocoding() : options.reverseGeocoding;
+
+        if(shouldApplyAddressFromCoordinates) {
+            _applyAddressFromViewModelCoordinates();
+        }
+
+        _applySearchRadiusFromViewModel();
 
         _showLoader();
-        incidentService.findIncidentsWithRadialSearch(params, 'geojson', function(geoJson) {
+        incidentService.findIncidentsWithRadialSearch(params, function(incidentsJson) {
             _hideLoader();
-            mapModule.drawRadialIncidents(geoJson);
-            tableModule.loadDataToTable(geoJson);
+            mapModule.drawRadialIncidents(_convertJsonToGeoJson(incidentsJson));
+            tableModule.loadDataToTable(incidentsJson);
         });
     }
 
@@ -53,16 +77,53 @@ var pageModule = (function(window, $) {
             endDate: viewModelModule.endDate,
             longitude: viewModelModule.longitude,
             latitude: viewModelModule.latitude,
-            radius: viewModelModule.searchRadius
+            searchRadius: _convertFromFeetToMeters(viewModelModule.searchRadius)
         };
     }
 
+    function _applyAddressFromViewModelCoordinates() {
+        var latitude = viewModelModule.latitude;
+        var longitude = viewModelModule.longitude;
+        addressService.getAddressFromCoordinates(latitude, longitude, function(address) {
+            $('#input-address').val(address.features[0].place_name);
+        });
+    }
+
+    function _applySearchRadiusFromViewModel() {
+        $('#range-slider-input').val(parseInt(viewModelModule.searchRadius));
+    }
+
+    function _convertJsonToGeoJson(json) {
+        var geoJson = { type: 'FeatureCollection', features: [] };
+        json.forEach(function(incidentJson) {
+            var incidentGeometry = incidentJson.location;
+            delete incidentJson.location; 
+            var incidentProperties = incidentJson; 
+            geoJson.features.push({
+                type: 'Feature',
+                geometry: incidentGeometry,
+                properties: incidentProperties
+            });
+        });
+
+        return geoJson;
+    }
+
+    function _convertFromFeetToMeters(feet) {
+        return feet * METERS_PER_FOOT;
+    }
+
+    function shouldApplyReverseGeocoding() {
+        return !viewModelModule.searchAddress
+            || viewModelModule.searchShapeType === 'polygon';
+    }
+
     function _showLoader() {
-        $(".loading").show();
+        $('.loading').show();
     }
 
     function _hideLoader() {
-        $(".loading").hide();
+        $('.loading').hide();
     }
 
     return {

@@ -8,10 +8,11 @@ var formModule = (function(window, $) {
     }
 
     function _initializeAddressSearchInput() {
-        $('#inputAddress').typeahead({
+        $('#input-address').typeahead({
             source: addressService.getAddressSuggestions,
             minLength: 4,
             items: 10,
+            delay: 150,
             display: 'text',
             afterSelect: _afterAddressSelect
           });
@@ -19,7 +20,7 @@ var formModule = (function(window, $) {
 
     function _initializeAddressSearchRadiusRangeSlider() {
         $('#range-slider').noUiSlider({
-            start: 1320, //
+            start: viewModelModule.searchRadius,
             step: 1,
             connect: 'lower',
             range: {
@@ -30,7 +31,7 @@ var formModule = (function(window, $) {
         .on({
             set: function() {
                 viewModelModule.searchShapeType = 'radial';
-                viewModelModule.searchRadius = $(this).val() * .3048;
+                viewModelModule.searchRadius = $(this).val();
                 pageModule.loadIncidentData();
             }
         })
@@ -40,12 +41,8 @@ var formModule = (function(window, $) {
     }
 
     function _initializeDateRange() {
-        var startDate = viewModelModule.startDate
-          ? moment(viewModelModule.startDate)
-          : moment().subtract(29, 'days');
-        var endDate = viewModelModule.endDate
-          ? moment(viewModelModule.endDate)
-          : moment();
+        var startDate = moment(viewModelModule.startDate);
+        var endDate = moment(viewModelModule.endDate);
 
         $('#daterange').val(startDate.format('MM/DD/YYYY') + ' - ' + endDate.format('MM/DD/YYYY'));
 
@@ -84,19 +81,12 @@ var formModule = (function(window, $) {
     }
 
     function _afterAddressSelect(selectedOption) {
-        addressService.getAddress(selectedOption.name, function(address) {
-            var addressFeature = address.features[0];
+        viewModelModule.searchShapeType = 'radial';
+        viewModelModule.searchAddress = selectedOption.name;
+        viewModelModule.latitude = selectedOption.latitude;
+        viewModelModule.longitude = selectedOption.longitude;
 
-            viewModelModule.latitude = addressFeature.geometry.coordinates[1];
-            viewModelModule.longitude = addressFeature.geometry.coordinates[0];
-            viewModelModule.searchAddress = addressFeature.properties.name;
-            viewModelModule.searchCity = addressFeature.properties.locality;
-            viewModelModule.searchState = addressFeature.region;
-            viewModelModule.searchZip = addressFeature.postalCode;
-            viewModelModule.searchShapeType = 'radial';
-
-            pageModule.loadIncidentData();
-        });
+        pageModule.loadIncidentData();
     }
 
     return {

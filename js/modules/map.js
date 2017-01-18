@@ -1,6 +1,6 @@
 var mapModule = (function(window,$) {
 
-    var MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiY3JpbWVkYXRhc2YiLCJhIjoiY2l2Y296YTl2MDE2bTJ0cGI1NGoyY2RzciJ9.DRX-7gKkJy4FT2Q1Qybb2w';
+    var MAPBOX_ACCESS_TOKEN = resourceTokensModule.MAPBOX_ACCESS_TOKEN;
     var MAPBOX_MAP_STYLE_ID = 'lightfox.1n10e3dp';
     var MAP_CONTAINER_ELEMENT_ID = 'map';
     
@@ -29,10 +29,11 @@ var mapModule = (function(window,$) {
             polyline: false,
             polygon: { shapeOptions: SHAPE_STYLE_SETTINGS },
             rectangle: { shapeOptions: SHAPE_STYLE_SETTINGS },
-            circle: false,
-            marker: false
+            circle: { shapeOptions: SHAPE_STYLE_SETTINGS }
         }
     };
+
+    var METERS_PER_FOOT = 0.3048;
 
     var searchAreaGroup = L.featureGroup();
     var incidentLayer = L.mapbox.featureLayer();
@@ -53,8 +54,37 @@ var mapModule = (function(window,$) {
     }
 
     function _afterDraw(e) {
+        switch(e.layerType) {
+            case 'polygon':
+            case 'rectangle': _afterDrawPolygon(e);
+                break;
+            case 'circle': _afterDrawCircle(e);
+                break;
+            case 'marker': _afterDrawMarker(e);
+                break;
+        }
+    }
+
+    function _afterDrawPolygon(e) {
         viewModelModule.searchShapeType = 'polygon';
         viewModelModule.searchGeoJson = e.layer.toGeoJSON();
+        pageModule.loadIncidentData({ reverseGeocoding: false });
+    }
+
+    function _afterDrawCircle(e) {
+        viewModelModule.searchShapeType = 'radial';
+        viewModelModule.latitude = e.layer._latlng.lat;
+        viewModelModule.longitude = e.layer._latlng.lng;
+        viewModelModule.searchRadius = _convertFromMetersToFeet(e.layer._mRadius);
+        viewModelModule.searchAddress = null;
+        pageModule.loadIncidentData();
+    }
+
+    function _afterDrawMarker(e) {
+        viewModelModule.searchShapeType = 'radial';
+        viewModelModule.latitude = e.layer._latlng.lat;
+        viewModelModule.longitude = e.layer._latlng.lng;
+        viewModelModule.searchAddress = null;
         pageModule.loadIncidentData();
     }
 
@@ -80,7 +110,7 @@ var mapModule = (function(window,$) {
     function _drawRadialSearchArea() {
         var latitude = viewModelModule.latitude,
             longitude = viewModelModule.longitude,
-            radius = viewModelModule.searchRadius;
+            radius = _convertFromFeetToMeters(viewModelModule.searchRadius);
 
         var searchMarkerGeoJson = $.extend(true, {}, SEARCH_MARKER_GEOJSON, {
             geometry: { coordinates: [ longitude, latitude ] }
@@ -112,6 +142,14 @@ var mapModule = (function(window,$) {
 
     function _buildIncidentPopupContent(properties) {
         return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
+    }
+
+    function _convertFromFeetToMeters(feet) {
+        return feet * METERS_PER_FOOT;
+    }
+
+    function _convertFromMetersToFeet(meters) {
+        return meters / METERS_PER_FOOT;
     }
 
     return {

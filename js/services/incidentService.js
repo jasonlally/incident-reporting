@@ -1,6 +1,5 @@
 var incidentService = (function(window, $) {
 
-    var INCIDENTS_API_GEOJSON_URL = resourceEndpointsModule.INCIDENTS_API_GEOJSON_URL;
     var INCIDENTS_API_JSON_URL = resourceEndpointsModule.INCIDENTS_API_JSON_URL;
 
     function _findMostRecentIncident(callback) {
@@ -13,17 +12,16 @@ var incidentService = (function(window, $) {
         });
     }
 
-    function _findIncidentsWithPolygonSearch(searchParams, dataFormat, callback) {
+    function _findIncidentsWithPolygonSearch(searchParams, callback) {
         var query = _buildPolygonIncidentDataQuery(searchParams);
-        var url = _buildIncidentDataUrl(dataFormat, query);
-
-        $.get(url, callback);
+        $.get(INCIDENTS_API_JSON_URL + query, callback);
     }
 
     function _buildPolygonIncidentDataQuery(params) {
         var wellKnownTextPolygon = _buildWellKnownTextFromGeoJson(params.searchGeoJson);
 
-        return "?$where="
+        return "?$select=incidntnum,category,descript,resolution,location"
+          + "&$where="
           + "date >= '" + params.startDate + "'"
           + " AND date <= '" + params.endDate + "'"
           + " AND within_polygon(location, \'" + wellKnownTextPolygon + "\')"
@@ -39,28 +37,19 @@ var incidentService = (function(window, $) {
         return 'MULTIPOLYGON (((' + coordinates + ')))';
     }
 
-    function _findIncidentsWithRadialSearch(searchParams, dataFormat, callback) {
+    function _findIncidentsWithRadialSearch(searchParams, callback) {
         var query = _buildRadialIncidentDataQuery(searchParams);
-        var url = _buildIncidentDataUrl(dataFormat, query);
-
-        $.get(url, callback);
+        $.get(INCIDENTS_API_JSON_URL + query, callback);
     }
 
     function _buildRadialIncidentDataQuery(params) {
-        return "?$where="
+        return "?$select=incidntnum,category,descript,resolution,location"
+          + "&$where="
           + "date >= '" + params.startDate + "'"
           + " AND date <= '" + params.endDate + "'"
-          + " AND within_circle(location," +  params.latitude + "," + params.longitude + "," + params.radius + ")"
+          + " AND within_circle(location," +  params.latitude + "," + params.longitude + "," + params.searchRadius + ")"
           + "&$order=date DESC"
           + "&$limit=100000";
-    }
-
-    function _buildIncidentDataUrl(dataFormat, query) {
-        var incidentsEndpoint = dataFormat === 'geojson'
-            ? INCIDENTS_API_GEOJSON_URL
-            : INCIDENTS_API_JSON_URL;
-
-        return incidentsEndpoint + query;
     }
 
     return {

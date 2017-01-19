@@ -30,15 +30,17 @@ var historyModule = (function() {
 
         return fields.reduce(function(searchParams, field) {
             if(viewModelModule.defaults[field] !== viewModelModule[field]) {
-                searchParams[field] = _getSearchParamValue(viewModelModule[field]);
+                searchParams[field] = _getSearchParamValue(field, viewModelModule[field]);
             }
 
             return searchParams;
         }, {}); 
     }
 
-    function _getSearchParamValue(viewModelFieldValue) {
-        if(typeof(viewModelFieldValue) === 'number') {
+    function _getSearchParamValue(viewModelFieldName, viewModelFieldValue) {
+        if(viewModelFieldName === 'searchRadius') {
+            return parseInt(viewModelFieldValue);
+        } else if(typeof(viewModelFieldValue) === 'number') {
             return Number(viewModelFieldValue.toPrecision(5));
         } else if(typeof(viewModelFieldValue) === 'object') {
             return JSON.stringify(viewModelFieldValue);

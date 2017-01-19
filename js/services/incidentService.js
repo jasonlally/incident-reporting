@@ -20,7 +20,7 @@ var incidentService = (function(window, $) {
     function _buildPolygonIncidentDataQuery(params) {
         var wellKnownTextPolygon = _buildWellKnownTextFromGeoJson(params.searchGeoJson);
 
-        return "?$select=incidntnum,category,descript,resolution,location"
+        return "?$select=location,incidntnum,category,descript,resolution,date,time,pddistrict,address"
           + "&$where="
           + "date >= '" + params.startDate + "'"
           + " AND date <= '" + params.endDate + "'"
@@ -43,7 +43,7 @@ var incidentService = (function(window, $) {
     }
 
     function _buildRadialIncidentDataQuery(params) {
-        return "?$select=incidntnum,category,descript,resolution,location"
+        return "?$select=location,incidntnum,category,descript,resolution,date,time,pddistrict,address"
           + "&$where="
           + "date >= '" + params.startDate + "'"
           + " AND date <= '" + params.endDate + "'"

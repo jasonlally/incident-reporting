@@ -12,23 +12,18 @@ var urlSearchModule = (function() {
             ? JSON.parse(params.searchGeoJson) : null;
 
        if(params.searchAddress && !(params.latitude && params.longitude)) {
-           addressService.getAddress(params.searchAddress, _afterGetAddress);
+           addressService.getAddressSuggestions(params.searchAddress, _afterGetAddressSuggestions);
        } else {
            pageModule.loadIncidentData(LOAD_INCIDENT_DATA_OPTIONS);
        }
     }
 
-    function _afterGetAddress(address) {
-        var firstFeature = address ? address.features[0] : {};
-        if(firstFeature.coordinates) {
-            viewModelModule.latitude = firstFeature.coordinates[1];
-            viewModelModule.longitude = firstFeature.coordinates[0];
-        }
-
-        if(firstFeature.properties) {
-            viewModelModule.searchAddress = firstFeature.properties.label;
-            $('#inputAddress').val(firstFeature.properties.label);
-        }
+    function _afterGetAddressSuggestions(addressSuggestions) {
+        var firstAddress = addressSuggestions.length ? addressSuggestions[0] : {};
+        viewModelModule.latitude = firstAddress.latitude;
+        viewModelModule.longitude = firstAddress.longitude;
+        viewModelModule.searchAddress = firstAddress.name;
+        $('#input-address').val(firstAddress.name);
 
         pageModule.loadIncidentData(LOAD_INCIDENT_DATA_OPTIONS);
     }

@@ -33,11 +33,14 @@ var mapModule = (function(window,$) {
         }
     };
 
+    var INCIDENT_CLUSTER_LAYER_SETTINGS = {
+        showCoverageOnHover: false
+    };
+
     var METERS_PER_FOOT = 0.3048;
 
     var searchAreaGroup = L.featureGroup();
-    var incidentLayer = L.mapbox.featureLayer();
-    var incidentClusterGroup = new L.MarkerClusterGroup({ showCoverageOnHover: false });
+    var incidentLayer, incidentClusterGroup;
 
     var map;
 
@@ -47,8 +50,6 @@ var mapModule = (function(window,$) {
 
         var drawControl = new L.Control.Draw(DRAW_CONTROL_SETTINGS).addTo(map);
         searchAreaGroup.addTo(map);
-        incidentLayer.addTo(map);
-        incidentClusterGroup.addTo(map);
 
         map.on('draw:created', _afterDraw);
     }
@@ -125,7 +126,16 @@ var mapModule = (function(window,$) {
     }
 
     function _drawIncidents(incidentGeoJson) {
-        incidentClusterGroup.clearLayers();
+        if(incidentLayer) {
+            map.removeLayer(incidentLayer)
+        }
+
+        if(incidentClusterGroup) {
+            map.removeLayer(incidentClusterGroup);
+        }
+
+        incidentLayer = L.mapbox.featureLayer();
+        incidentClusterGroup = new L.MarkerClusterGroup(INCIDENT_CLUSTER_LAYER_SETTINGS);
 
         $.each(incidentGeoJson.features, function(index, feature) {
             $.extend(feature.properties, INCIDENT_MARKER_PROPERTIES);
@@ -135,9 +145,11 @@ var mapModule = (function(window,$) {
             incidentClusterGroup.addLayer(layer);
             layer.bindPopup(_buildIncidentPopupContent(layer.feature.properties));
         });
-
         incidentLayer.clearLayers();
-        map.fitBounds(searchAreaGroup.getBounds());
+
+        map.addLayer(incidentLayer)
+            .addLayer(incidentClusterGroup)
+            .fitBounds(searchAreaGroup.getBounds());
     }
 
     function _buildIncidentPopupContent(properties) {

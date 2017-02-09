@@ -1,85 +1,44 @@
-var urlSearch = (function() {
+var urlSearchModule = (function() {
 
-    function _runURLsearch() {
-        var uri = new URI();
-        uri = uri.query(true);
+    var LOAD_INCIDENT_DATA_OPTIONS = { pushState: false };
 
-        var search = uri.address + ", " + uri.city + ", " + uri.state;
+    function _initializeViewModelFromUrlParameters() {
+        var params = new URI().query(true);
 
-        //Assign the returned autocomplete values to a variable
-        var addressCall = resourcesModule.getJustAddress(search);
+        $.extend(true, viewModelModule, params);
 
-        addressCall.done(function(data){
-            //Use the map module to change the user pin's location
-            mapModule.plotUserLocation(data.features[0]);
-            mapModule.centerMapOnLocation(data.features[0]);
-            mapModule.setUserSearchRadius(uri.radius);
+        viewModelModule.searchShapeType = _getSearchShapeType(params);
+        viewModelModule.searchGeoJson = params.searchGeoJson
+            ? JSON.parse(params.searchGeoJson) : null;
 
-            //assign the selected values to the address and radius fields
-            $('#inputAddress').val(search);
-
-            controlsModule.searchCrime();
-        });
+       if(params.searchAddress && !(params.latitude && params.longitude)) {
+           addressService.getAddressSuggestions(params.searchAddress, _afterGetAddressSuggestions);
+       } else {
+           pageModule.loadIncidentData(LOAD_INCIDENT_DATA_OPTIONS);
+       }
     }
 
-    function _pushIntoUrl(userLocation, dates, radius) {
-        var newSearch = null;
-        var uri = new URI();
-        var searchInput = {};
+    function _afterGetAddressSuggestions(addressSuggestions) {
+        var firstAddress = addressSuggestions.length ? addressSuggestions[0] : {};
+        viewModelModule.latitude = firstAddress.latitude;
+        viewModelModule.longitude = firstAddress.longitude;
+        viewModelModule.searchAddress = firstAddress.name;
+        $('#input-address').val(firstAddress.name);
 
-        if (userLocation) {
-            searchInput = Object.assign(searchInput, {
-                address: userLocation.properties.name,
-                city: userLocation.properties.locality,
-                state: userLocation.properties.region,
-                zip: userLocation.properties.postalcode
-            })
-        }
-        if (dates) {
-            searchInput = Object.assign(searchInput, dates);
-        }
-        if (radius) {
-            radius = radius.toFixed(0);
-            searchInput = Object.assign(searchInput, {radius: radius});
-        }
-
-        uri.setSearch(searchInput);
-        newSearch = uri.build();
-
-        history.pushState(null, '', newSearch);
+        pageModule.loadIncidentData(LOAD_INCIDENT_DATA_OPTIONS);
     }
 
-    function _getStartDate() {
-        var uri = new URI();
-        uri = uri.search(true);
-        var date = uri.startDate ? moment(uri.startDate) : moment().subtract(29, 'days');
-        return date;
-    }
-
-    function _getEndDate() {
-        var uri = new URI();
-        uri = uri.search(true);
-        return moment(uri.endDate);
-    }
-
-    function _getRadius(unit){
-        var result = null;
-        var uri = new URI();
-        uri = uri.search(true);
-        if (uri.radius) {
-            result = (unit === "ft") ? uri.radius * 3.28084 : uri.radius;
-            result = result.toFixed(0);
+    function _getSearchShapeType(params) {
+        if(params.searchAddress || (params.latitude && params.longitude)) {
+            return 'radial';
+        } else if(params.searchGeoJson) {
+            return 'polygon';
         } else {
-            result = 1320;
+            return viewModelModule.defaults.searchShapeType;
         }
-        return result;
     }
 
     return {
-        runURLsearch: _runURLsearch,
-        pushIntoUrl: _pushIntoUrl,
-        getStartDate: _getStartDate,
-        getEndDate: _getEndDate,
-        getRadius: _getRadius
-    }
-})(window, jQuery);
+        initializeViewModelFromUrlParameters: _initializeViewModelFromUrlParameters
+    };
+})();

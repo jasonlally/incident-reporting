@@ -153,7 +153,9 @@ var mapModule = (function(window,$) {
     }
 
     function _buildIncidentPopupContent(properties) {
-        return properties.descript + '; INCIDENT #: ' + properties.incidntnum;
+        var newDate = properties.date;
+        var formattedDate = newDate.slice(5,7) + "/" + newDate.slice(8,10) + "/" + newDate.slice(0,4);
+        return properties.descript + " on " + formattedDate;
     }
 
     function _convertFromFeetToMeters(feet) {

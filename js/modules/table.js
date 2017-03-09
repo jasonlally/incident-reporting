@@ -76,48 +76,36 @@ var tableModule = (function(window, $) {
     incidentJson with the new cscategory field based on this logic*/
     function _csCategoryCheck(incidentJson){
         for (var i = 0; i < incidentJson.length; i++){
-            if (!("cscategory" in incidentJson[i])){
-                incidentJson[i].cscategory = "";
-            }
             switch (true){
-                case incidentJson[i].category === "ASSAULT":
-                    if (incidentJson[i].descript.includes("AGGRAVATED")){
-                       incidentJson[i].cscategory += "AGGRAVATED ASSAULT"; 
-                    }
-                    if ((incidentJson[i].descript.includes("WEAPON") || 
-                        incidentJson[i].descript.includes("GUN") ||
-                        incidentJson[i].descript.includes("KNIFE") || 
-                        incidentJson[i].descript.includes("FIREARM") || 
-                        incidentJson[i].descript.includes("SHOOTING")) && 
-                        incidentJson[i].resolution.includes("ARREST")){
-                        if (incidentJson[i].cscategory !== ""){
-                            incidentJson[i].cscategory += ", ";
-                        } 
-                        incidentJson[i].cscategory += "WEAPONS POSSESSION"; 
-                    }
-                    if (incidentJson[i].descript.includes("DATING")){
-                        if (incidentJson[i].cscategory !== ""){
-                            incidentJson[i].cscategory += ", ";
-                        } 
-                        incidentJson[i].cscategory += "DATING VIOLENCE"; 
-                    }
-                    if (incidentJson[i].descript.includes("HATE") || 
-                        incidentJson[i].descript.includes("TERROR")){
-                        if (incidentJson[i].cscategory !== ""){
-                            incidentJson[i].cscategory += ", ";
-                        } 
-                        incidentJson[i].cscategory += "HATE CRIMES"; 
-                    }
-                    if (incidentJson[i].descript.includes("STALKING")){
-                        if (incidentJson[i].cscategory !== ""){
-                            incidentJson[i].cscategory += ", ";
-                        } 
-                        incidentJson[i].cscategory += "STALKING"; 
-                    }
-                    break;
                 case incidentJson[i].category === "ARSON":
                     incidentJson[i].cscategory = "ARSON";
                     break; 
+                case (incidentJson[i].category === "ASSAULT" &&
+                    incidentJson[i].descript.includes("AGGRAVATED")):
+                    incidentJson[i].cscategory = "AGGRAVATED ASSAULT"; 
+                    break;
+                case (incidentJson[i].category === "ASSAULT" &&
+                    incidentJson[i].descript.includes("DATING")):
+                    incidentJson[i].cscategory = "DATING VIOLENCE"; 
+                    break;
+                case (incidentJson[i].category === "ASSAULT" &&
+                    (incidentJson[i].descript.includes("HATE") || 
+                    incidentJson[i].descript.includes("TERROR"))):
+                    incidentJson[i].cscategory = "HATE CRIMES"; 
+                    break;
+                case (incidentJson[i].category === "ASSAULT" &&
+                    incidentJson[i].descript.includes("STALKING")):
+                    incidentJson[i].cscategory = "STALKING"; 
+                    break;
+                case (incidentJson[i].category === "ASSAULT" &&
+                    incidentJson[i].resolution.includes("ARREST") &&
+                    (incidentJson[i].descript.includes("WEAPON") || 
+                        incidentJson[i].descript.includes("GUN") ||
+                        incidentJson[i].descript.includes("KNIFE") || 
+                        incidentJson[i].descript.includes("FIREARM") || 
+                        incidentJson[i].descript.includes("SHOOTING"))):
+                    incidentJson[i].cscategory = "WEAPONS POSSESSION";
+                    break;
                 case incidentJson[i].category === "BURGLARY":
                     incidentJson[i].cscategory = "BURGLARY";
                     break;
@@ -143,22 +131,17 @@ var tableModule = (function(window, $) {
                 case incidentJson[i].category === "ROBBERY":
                     incidentJson[i].cscategory = "ROBBERY";
                     break;
-                case incidentJson[i].category === "SECONDARY CODES":
-                    if (incidentJson[i].descript.includes("DOMESTIC VIOLENCE")){
-                       incidentJson[i].cscategory += "DOMESTIC VIOLENCE"; 
-                    }
-                    if (incidentJson[i].descript.includes("PREJUDICE")){
-                        if (incidentJson[i].cscategory !== ""){
-                            incidentJson[i].cscategory += ", ";
-                        } 
-                        incidentJson[i].cscategory += "HATE CRIMES"; 
-                    }
-                    if (incidentJson[i].descript.includes("WEAPONS")){
-                        if (incidentJson[i].cscategory !== ""){
-                            incidentJson[i].cscategory += ", ";
-                        } 
-                        incidentJson[i].cscategory += "WEAPONS POSSESSION"; 
-                    }
+                case (incidentJson[i].category === "SECONDARY CODES" &&
+                    incidentJson[i].descript.includes("DOMESTIC VIOLENCE")):
+                    incidentJson[i].cscategory = "DOMESTIC VIOLENCE"; 
+                    break;
+                case (incidentJson[i].category === "SECONDARY CODES" &&
+                    incidentJson[i].descript.includes("PREJUDICE")):
+                    incidentJson[i].cscategory = "HATE CRIMES"; 
+                    break;
+                case (incidentJson[i].category === "SECONDARY CODES" &&
+                    incidentJson[i].descript.includes("WEAPONS")):
+                    incidentJson[i].cscategory = "WEAPONS POSSESSION"; 
                     break;
                 case (incidentJson[i].category === "SEX OFFENSES, FORCIBLE" ||
                     incidentJson[i].category === "SEX OFFENSES, NON FORCIBLE"):

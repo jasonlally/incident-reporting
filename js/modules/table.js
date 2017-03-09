@@ -109,24 +109,32 @@ var tableModule = (function(window, $) {
                 case incidentJson[i].category === "BURGLARY":
                     incidentJson[i].cscategory = "BURGLARY";
                     break;
-                case ((incidentJson[i].category === "DRIVING UNDER THE INFLUENCE" &&
+                case (incidentJson[i].category === "DRIVING UNDER THE INFLUENCE" &&
                     incidentJson[i].descript.includes("ALCOHOL") && 
-                    incidentJson[i].resolution.includes("ARREST")) ||
-                    (incidentJson[i].category === "DRUNKENNESS" && 
-                    incidentJson[i].resolution.includes("ARREST")) ||
-                    (incidentJson[i].category === "LIQUOR LAWS" && 
-                    incidentJson[i].resolution.includes("ARREST")) ||
-                    (incidentJson[i].category === "OTHER OFFENSES" &&
-                    incidentJson[i].descript.includes("ALCOHOL") && 
-                    incidentJson[i].resolution.includes("ARREST"))):
+                    incidentJson[i].resolution.includes("ARREST")): 
                     incidentJson[i].cscategory = "LIQUOR LAW VIOLATIONS";
                     break;
-                case ((incidentJson[i].category === "DRIVING UNDER THE INFLUENCE" &&
+                case (incidentJson[i].category === "DRIVING UNDER THE INFLUENCE" &&
                     incidentJson[i].descript.includes("DRUGS") && 
-                    incidentJson[i].resolution.includes("ARREST")) ||
-                    (incidentJson[i].category === "DRUG/NARCOTIC" && 
-                    incidentJson[i].resolution.includes("ARREST"))):
+                    incidentJson[i].resolution.includes("ARREST")):
                     incidentJson[i].cscategory = "DRUG-RELATED VIOLATIONS";
+                    break;
+                case (incidentJson[i].category === "DRUG/NARCOTIC" && 
+                    incidentJson[i].resolution.includes("ARREST")):
+                    incidentJson[i].cscategory = "DRUG-RELATED VIOLATIONS";
+                    break;
+                case (incidentJson[i].category === "DRUNKENNESS" && 
+                    incidentJson[i].resolution.includes("ARREST")): 
+                    incidentJson[i].cscategory = "LIQUOR LAW VIOLATIONS";
+                    break;
+                case (incidentJson[i].category === "LIQUOR LAWS" && 
+                    incidentJson[i].resolution.includes("ARREST")): 
+                    incidentJson[i].cscategory = "LIQUOR LAW VIOLATIONS";
+                    break;
+                case (incidentJson[i].category === "OTHER OFFENSES" &&
+                    incidentJson[i].descript.includes("ALCOHOL") && 
+                    incidentJson[i].resolution.includes("ARREST")):
+                    incidentJson[i].cscategory = "LIQUOR LAW VIOLATIONS";
                     break;
                 case incidentJson[i].category === "ROBBERY":
                     incidentJson[i].cscategory = "ROBBERY";

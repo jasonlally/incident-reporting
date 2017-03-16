@@ -55,7 +55,7 @@ var tableModule = (function(window, $) {
             data: "resolution",
             title: "Resolution",
             name: "resolution",
-        }, /*Added the clery category*/{
+        }, {
             data: "cscategory", 
             title: "CSCategory",
             name: "cscategory",
@@ -72,7 +72,7 @@ var tableModule = (function(window, $) {
         _table = $('#example').DataTable(TABLE_CONFIG);
     }
 
-    /*function that contains logic for clery category & then adjusts the
+    /*function that contains logic for the 'CSCategory' column & then adjusts the
     incidentJson with the new cscategory field based on this logic*/
     function _csCategoryCheck(incidentJson){
         for (var i = 0; i < incidentJson.length; i++){

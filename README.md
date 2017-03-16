@@ -28,8 +28,9 @@ Create a single place for all universities and colleges in the United States to 
 ## Running Codebase Locally
 If you want to download the github repository and run the code locally on your Apple machine,
 - open terminal
-- go to the folder directory 
+- go to the folder directory
 - run 'python -m SimpleHTTPServer'
+- go to a browser and type in localhost:"PORT_NUMBER"
 
 ## Contributing: Getting Started
 * Attend a [Code for San Francisco](http://codeforsanfrancisco.org/events) orientation 
@@ -68,7 +69,7 @@ However, the prototype has a few things that could be greatly improved (also lis
 
 ## Wouldn't It Be Cool If...
 When prompted to think about other uses for this web app, the SFPD crime data analysts asked for the following:
-* Ability to overlay data layers, such as PD district laters, sector layers (police beats), political jurisdictions, plots (9sq block areas), and national/state/local parks. 
+* Ability to overlay data layers, such as PD district laters, sector layers (police beats), political jurisdictions, plots (9sq block areas), and national/state/local parks.
 * Why? Police captains want to see what is going on in their jurisdiction, cops want to see what happened on their beats while they were off duty, the Mayor's Office wants to know what's going on in a particular area, and SFPD in general wants to know what's going on on their turf (hence the park layer). The Crime Data Analysis Team runs regular (weekly) reports for nearly all of these folks and the team could save even MORE time by sharing this web app with the entire SFPD, who could run their own reports by themselves.
 * Ability to see crime data over time (add beginning and ending time period filter).
-* Why? Every single captain of every single district (and anyone else who has to report to constituents) wants to know if they're up or down on crime over a specific period of time. 
+* Why? Every single captain of every single district (and anyone else who has to report to constituents) wants to know if they're up or down on crime over a specific period of time.

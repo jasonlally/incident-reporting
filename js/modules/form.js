@@ -41,6 +41,7 @@ var formModule = (function(window, $) {
     }
 
     function _initializeDateRange() {
+        
         var startDate = moment(viewModelModule.startDate);
         var endDate = moment(viewModelModule.endDate);
 
@@ -56,14 +57,18 @@ var formModule = (function(window, $) {
                 'This Year': [moment().startOf('year'), moment()],
                 'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
             },
-            startDate: startDate,
-            endDate: endDate,
+            startDate: moment(),
+            endDate: moment().subtract(29, 'days'),
             format: 'MM/DD/YYYY'
         }, function(startDate, endDate) {
-            var formattedStartDate = startDate.format('YYYY-MM-DD');
-            var formattedEndDate = endDate.format('YYYY-MM-DD');
-            viewModelModule.startDate = formattedStartDate;
-            viewModelModule.endDate = formattedEndDate;
+            console.log(startDate);
+            console.log(endDate);
+            var formattedStartDate = startDate.format('MM/DD/YYYY');
+            var formattedEndDate = endDate.format('MM/DD/YYYY');
+            viewModelModule.startDate = startDate.format('YYYY-MM-DD');
+            viewModelModule.endDate = endDate.format('YYYY-MM-DD');
+            console.log(formattedStartDate);
+            console.log(formattedEndDate);
             $('#daterange').val(formattedStartDate + ' - ' + formattedEndDate);
 
             pageModule.loadIncidentData();

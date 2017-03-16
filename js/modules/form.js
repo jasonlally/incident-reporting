@@ -61,14 +61,10 @@ var formModule = (function(window, $) {
             endDate: moment().subtract(29, 'days'),
             format: 'MM/DD/YYYY'
         }, function(startDate, endDate) {
-            console.log(startDate);
-            console.log(endDate);
             var formattedStartDate = startDate.format('MM/DD/YYYY');
             var formattedEndDate = endDate.format('MM/DD/YYYY');
             viewModelModule.startDate = startDate.format('YYYY-MM-DD');
             viewModelModule.endDate = endDate.format('YYYY-MM-DD');
-            console.log(formattedStartDate);
-            console.log(formattedEndDate);
             $('#daterange').val(formattedStartDate + ' - ' + formattedEndDate);
 
             pageModule.loadIncidentData();

@@ -1,7 +1,5 @@
 # SF Crime Data
-A quick prototype to test pulling incident reports from SF Open Data
-
-Note: this repository takes advantage of [ZenHub](https://www.zenhub.io/). If you haven't added it to your Github yet, it's recommended to better understand how issues are prioritized.
+Pull incident reports from SF Open Data and display results using Mapbox.
 
 
 ## Initial Use Case:
@@ -22,10 +20,12 @@ Create a single place for all universities and colleges in the United States to 
 
 
 ## Project Needs
+ - **Front-end developer!** Yup. Self-explanatory if you read the above paragraph. Bonus points if you love APIs and are up for the challenge of keeping the whole project browser-based... even the coming versions.
  - **Copywriter!** The site needs more and easily understandable information on it. Zero coding required.
  - **User Researcher!** Can you reach out to a university's crime data reporting team, understand their needs (without biasing them), and take notes as they test this application? Zero coding required.
- - **Front-end developer!** Yup. Self-explanatory if you read the above paragraph. Bonus points if you love APIs and are up for the challenge of keeping the whole project browser-based... even the coming versions.
  - **Future project lead!** If you're interested managing in this project, come check it out asap and get up to speed... then build it out so any police department in the country can use it. **Time savings in the multiple thousands of workdays across the entire U.S.**
+
+Note: this repository takes advantage of [ZenHub](https://www.zenhub.io/). If you haven't added it to your Github yet, it's recommended to better understand how issues are prioritized.
 
 
 ## Contributing: Getting Started
